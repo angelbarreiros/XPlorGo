@@ -17,13 +17,13 @@ type xplorProvider struct {
 	authMutex *sync.Mutex
 }
 type xplorExecutor struct {
-	config         *xplorConfig
+	config         *XplorConfig
 	client         *http.Client
 	defaultTimeout time.Duration
 	nodeId         *string
 }
 
-func Init(cfg *xplorConfig) *xplorProvider {
+func Init(cfg *XplorConfig) *xplorProvider {
 
 	if xplorProviderInstace == nil {
 		xplorProviderInstace = &xplorProvider{
