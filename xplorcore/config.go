@@ -14,18 +14,20 @@ type neededHeaders struct {
 
 type XplorConfig struct {
 	Host           string
+	APIVersion     string
 	EnterpriseName string
 	ClientID       string
 	ClientSecret   string
 	NeededHeaders  []neededHeaders
 }
 
-func NewConfig(host string, enterpriseName, clientID, clientSecret string, headers map[string]string) *XplorConfig {
+func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string) *XplorConfig {
 	var config = &XplorConfig{
+		Host:           host,
+		APIVersion:     apiVersion,
 		EnterpriseName: enterpriseName,
 		ClientID:       clientID,
 		ClientSecret:   clientSecret,
-		Host:           host,
 	}
 	for headerName, value := range headers {
 		config.NeededHeaders = append(config.NeededHeaders, neededHeaders{
@@ -34,17 +36,16 @@ func NewConfig(host string, enterpriseName, clientID, clientSecret string, heade
 		})
 	}
 	// readEnvFile()
-
 	return config
 }
 
 func (xc *XplorConfig) generateRequest(method string, uri string, optionalHeaders map[string]string, queryParams url.Values, params url.Values) *http.Request {
-
 	request := &http.Request{
 		Method: method,
 		URL: &url.URL{
 			Scheme:   "https",
-			Host:     xc.Host + uri,
+			Host:     xc.Host,
+			Path:     "/" + xc.APIVersion + "/" + xc.EnterpriseName + uri,
 			RawQuery: queryParams.Encode(),
 		},
 		Header: make(http.Header),
