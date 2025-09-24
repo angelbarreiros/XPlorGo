@@ -76,7 +76,7 @@ type RequestResult[T any] struct {
 // ExecuteRequest handles common HTTP request execution pattern including error handling and response processing
 // It takes a context, http client, request, and returns a typed RequestResult
 func ExecuteRequest[T any](ctx context.Context, client *http.Client, request *http.Request) RequestResult[T] {
-	var zero T // zero value of type T
+	var zero T
 
 	response, clientErr := client.Do(request)
 	if clientErr != nil {
