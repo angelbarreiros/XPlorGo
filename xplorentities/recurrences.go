@@ -1,0 +1,278 @@
+package xplorentities
+
+import (
+	"errors"
+	"path"
+	"strings"
+
+	"github.com/angelbarreiros/XPlorGo/util"
+)
+
+// Estructuras principales para Recurrence Collection
+type XPlorRecurrences struct {
+	Context     string            `json:"@context"`
+	ID          string            `json:"@id"`
+	Type        string            `json:"@type"`
+	Recurrences []XPlorRecurrence `json:"hydra:member"`
+	Pagination  HydraView         `json:"hydra:view"`
+}
+
+type XPlorRecurrence struct {
+	ID                           *string         `json:"@id"`
+	Type                         string          `json:"@type"`
+	StartedAt                    util.LocalTime  `json:"startedAt"`
+	EndedAt                      util.LocalTime  `json:"endedAt"`
+	Frequency                    string          `json:"frequency"`
+	Day                          string          `json:"day"`
+	ExcludedDates                []string        `json:"excludedDates"`
+	ExtraDates                   []string        `json:"extraDates"`
+	ClassEventType               ClassEventType  `json:"classEventType"`
+	ClassEvents                  []string        `json:"classEvents"`
+	Processing                   bool            `json:"processing"`
+	DeletedAt                    *util.LocalTime `json:"deletedAt"`
+	DeletedBy                    *string         `json:"deletedBy"`
+	Action                       interface{}     `json:"action"`
+	CourseWaitingListRecurrences []interface{}   `json:"courseWaitingListRecurrences"`
+}
+
+type ClassEventType struct {
+	ID                  *string        `json:"@id"`
+	Type                string         `json:"@type"`
+	StartedAt           util.LocalTime `json:"startedAt"`
+	EndedAt             util.LocalTime `json:"endedAt"`
+	Summary             string         `json:"summary"`
+	Description         *string        `json:"description"`
+	Club                *string        `json:"club"`
+	Studio              *string        `json:"studio"`
+	Activity            *string        `json:"activity"`
+	Coach               *string        `json:"coach"`
+	AttendingLimit      int            `json:"attendingLimit"`
+	QueueLimit          int            `json:"queueLimit"`
+	PrivateComment      interface{}    `json:"privateComment"`
+	ClassLayout         interface{}    `json:"classLayout"`
+	InstructionsComment interface{}    `json:"instructionsComment"`
+	OnlineLimit         interface{}    `json:"onlineLimit"`
+	ExternalQuota       interface{}    `json:"externalQuota"`
+}
+
+// Función genérica para extraer IDs de strings (no punteros)
+func ExtractIDFromString(field string, errMsg string) (string, error) {
+	if field == "" {
+		return "", errors.New(errMsg)
+	}
+	cleanPath := strings.Split(field, "?")[0]
+	base := path.Base(cleanPath)
+	return base, nil
+}
+
+// Métodos para Recurrence
+func (r *XPlorRecurrence) RecurrenceID() (string, error) {
+	return ExtractID(r.ID, "recurrence ID field is nil")
+}
+
+func (r *XPlorRecurrence) ClassEventIDs() ([]string, error) {
+	if len(r.ClassEvents) == 0 {
+		return nil, errors.New("no class events available")
+	}
+
+	ids := make([]string, len(r.ClassEvents))
+	for i, classEvent := range r.ClassEvents {
+		id, err := ExtractIDFromString(classEvent, "class event ID field is empty")
+		if err != nil {
+			return nil, err
+		}
+		ids[i] = id
+	}
+	return ids, nil
+}
+
+// Métodos para ClassEventType
+func (cet *ClassEventType) ClassEventTypeID() (string, error) {
+	return ExtractID(cet.ID, "class event type ID field is nil")
+}
+
+func (cet *ClassEventType) ClubID() (string, error) {
+	return ExtractID(cet.Club, "club ID field is nil")
+}
+
+func (cet *ClassEventType) StudioID() (string, error) {
+	return ExtractID(cet.Studio, "studio ID field is nil")
+}
+func (cet *ClassEventType) CoachId() (string, error) {
+	return ExtractID(cet.Coach, "coach ID field is nil")
+}
+
+func (cet *ClassEventType) ActivityID() (string, error) {
+	return ExtractID(cet.Activity, "activity ID field is nil")
+}
+
+func (cet *ClassEventType) StartTime() string {
+	return cet.StartedAt.Time.Format("15:04")
+}
+
+func (cet *ClassEventType) EndTime() string {
+	return cet.EndedAt.Time.Format("15:04")
+}
+
+// Método para obtener el tipo de frecuencia
+func (r *XPlorRecurrence) GetFrequencyType() string {
+	freq := strings.ToLower(strings.TrimSpace(r.Frequency))
+	switch freq {
+	case "daily", "diario":
+		return "daily"
+	case "weekly", "semanal":
+		return "weekly"
+	case "monthly", "mensual":
+		return "monthly"
+	case "yearly", "anual":
+		return "yearly"
+	case "biweekly", "bisemanal":
+		return "biweekly"
+	case "bimonthly", "bimensual":
+		return "bimonthly"
+
+	default:
+		return "unknown"
+	}
+}
+
+// Método para obtener el día completo de la semana
+func (r *XPlorRecurrence) GetFullDay() string {
+	day := strings.ToLower(strings.TrimSpace(r.Day))
+	switch day {
+	// Inglés diminutivo
+	case "mo":
+		return "Monday"
+	case "tu":
+		return "Tuesday"
+	case "we":
+		return "Wednesday"
+	case "th":
+		return "Thursday"
+	case "fr":
+		return "Friday"
+	case "sa":
+		return "Saturday"
+	case "su":
+		return "Sunday"
+	// Español diminutivo
+	case "lu":
+		return "Monday"
+	case "ma":
+		return "Tuesday"
+	case "mi":
+		return "Wednesday"
+	case "ju":
+		return "Thursday"
+	case "vi":
+		return "Friday"
+	case "do":
+		return "Sunday"
+	// Si ya viene completo, devolverlo
+	case "monday", "lunes":
+		return "Monday"
+	case "tuesday", "martes":
+		return "Tuesday"
+	case "wednesday", "miércoles":
+		return "Wednesday"
+	case "thursday", "jueves":
+		return "Thursday"
+	case "friday", "viernes":
+		return "Friday"
+	case "saturday", "sábado":
+		return "Saturday"
+	case "sunday", "domingo":
+		return "Sunday"
+	default:
+		return "Unknown"
+	}
+}
+
+// Métodos para la colección completa
+func (rc *XPlorRecurrences) CollectionID() (string, error) {
+	return ExtractIDFromString(rc.ID, "collection ID field is empty")
+}
+
+func (rc *XPlorRecurrences) ContextID() (string, error) {
+	return ExtractIDFromString(rc.Context, "context ID field is empty")
+}
+
+// Método para obtener todos los IDs de recurrencia en la colección
+func (rc *XPlorRecurrences) AllRecurrenceIDs() ([]string, error) {
+	if len(rc.Recurrences) == 0 {
+		return nil, errors.New("no recurrences available")
+	}
+
+	ids := make([]string, len(rc.Recurrences))
+	for i, recurrence := range rc.Recurrences {
+		id, err := recurrence.RecurrenceID()
+		if err != nil {
+			return nil, err
+		}
+		ids[i] = id
+	}
+	return ids, nil
+}
+
+// Método para obtener todos los IDs de actividades en la colección
+func (rc *XPlorRecurrences) AllActivityIDs() ([]string, error) {
+	if len(rc.Recurrences) == 0 {
+		return nil, errors.New("no recurrences available")
+	}
+
+	activityIDs := make([]string, 0)
+	for _, recurrence := range rc.Recurrences {
+		activityID, err := recurrence.ClassEventType.ActivityID()
+		if err == nil { // Solo agregar si no hay error
+			activityIDs = append(activityIDs, activityID)
+		}
+	}
+
+	if len(activityIDs) == 0 {
+		return nil, errors.New("no activity IDs found")
+	}
+
+	return activityIDs, nil
+}
+
+// Método para obtener todos los IDs de estudios en la colección
+func (rc *XPlorRecurrences) AllStudioIDs() ([]string, error) {
+	if len(rc.Recurrences) == 0 {
+		return nil, errors.New("no recurrences available")
+	}
+
+	studioIDs := make([]string, 0)
+	for _, recurrence := range rc.Recurrences {
+		studioID, err := recurrence.ClassEventType.StudioID()
+		if err == nil { // Solo agregar si no hay error
+			studioIDs = append(studioIDs, studioID)
+		}
+	}
+
+	if len(studioIDs) == 0 {
+		return nil, errors.New("no studio IDs found")
+	}
+
+	return studioIDs, nil
+}
+
+// Método para obtener todos los IDs de clubs en la colección
+func (rc *XPlorRecurrences) AllClubIDs() ([]string, error) {
+	if len(rc.Recurrences) == 0 {
+		return nil, errors.New("no recurrences available")
+	}
+
+	clubIDs := make([]string, 0)
+	for _, recurrence := range rc.Recurrences {
+		clubID, err := recurrence.ClassEventType.ClubID()
+		if err == nil { // Solo agregar si no hay error
+			clubIDs = append(clubIDs, clubID)
+		}
+	}
+
+	if len(clubIDs) == 0 {
+		return nil, errors.New("no club IDs found")
+	}
+
+	return clubIDs, nil
+}
