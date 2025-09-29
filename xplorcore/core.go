@@ -9,24 +9,24 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-var xplorProviderInstace *xplorProvider = nil
+var xplorProviderInstace *XplorProvider = nil
+var syncOnce sync.Once
 
-type xplorProvider struct {
+type XplorProvider struct {
 	providers *sync.Pool
 	token     *xplorentities.XPlorTokenWithTimestamp
 	authMutex *sync.Mutex
 }
 type xplorExecutor struct {
-	config         *XplorConfig
+	config         *xplorConfig
 	client         *http.Client
 	defaultTimeout time.Duration
 	nodeId         *string
 }
 
-func Init(cfg *XplorConfig) *xplorProvider {
-
-	if xplorProviderInstace == nil {
-		xplorProviderInstace = &xplorProvider{
+func Init(cfg *xplorConfig) *XplorProvider {
+	syncOnce.Do(func() {
+		xplorProviderInstace = &XplorProvider{
 			authMutex: &sync.Mutex{},
 			providers: &sync.Pool{
 				New: func() any {
@@ -34,7 +34,7 @@ func Init(cfg *XplorConfig) *xplorProvider {
 				},
 			},
 		}
-	}
+	})
 	return xplorProviderInstace
 }
 func checkNodeId(nodeId string) *xplorentities.ErrorResponse {
@@ -47,7 +47,7 @@ func checkNodeId(nodeId string) *xplorentities.ErrorResponse {
 	return nil
 }
 
-func (pp xplorProvider) getExecutor(nodeId string) *xplorExecutor {
+func (pp XplorProvider) getExecutor(nodeId string) *xplorExecutor {
 	var executor = pp.providers.Get().(*xplorExecutor)
 	if strings.TrimSpace(nodeId) == "" {
 		executor.nodeId = nil
@@ -57,10 +57,10 @@ func (pp xplorProvider) getExecutor(nodeId string) *xplorExecutor {
 	}
 	return executor
 }
-func (pp xplorProvider) putExecutor(executor *xplorExecutor) {
+func (pp XplorProvider) putExecutor(executor *xplorExecutor) {
 	pp.providers.Put(executor)
 }
-func (pp xplorProvider) Close() {
+func (pp XplorProvider) Close() {
 	xplorProviderInstace = nil
 }
 func (xe *xplorExecutor) generateHeaders(accessToken string) map[string]string {
@@ -73,14 +73,14 @@ func (xe *xplorExecutor) generateHeaders(accessToken string) map[string]string {
 	}
 	return headers
 }
-func (xp xplorProvider) needsAuthentication(token *xplorentities.XPlorTokenWithTimestamp) bool {
+func (xp XplorProvider) needsAuthentication(token *xplorentities.XPlorTokenWithTimestamp) bool {
 	if token == nil {
 		return true
 	}
 
 	return !token.IsValid()
 }
-func (xe *xplorProvider) authenticateIfNeeded(executor *xplorExecutor) *xplorentities.ErrorResponse {
+func (xe *XplorProvider) authenticateIfNeeded(executor *xplorExecutor) *xplorentities.ErrorResponse {
 
 	// Double-check locking pattern
 	xe.authMutex.Lock()
@@ -104,7 +104,7 @@ func (xe *xplorProvider) authenticateIfNeeded(executor *xplorExecutor) *xplorent
 	return nil
 
 }
-func (xe *xplorProvider) Families(nodeId string, params *xplorentities.XPlorFamiliesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorFamilies, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Families(nodeId string, params *xplorentities.XPlorFamiliesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorFamilies, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (xe *xplorProvider) Families(nodeId string, params *xplorentities.XPlorFami
 	return families, nil
 
 }
-func (xe *xplorProvider) Family(nodeId string, familyId string) (*xplorentities.XPlorFamily, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Family(nodeId string, familyId string) (*xplorentities.XPlorFamily, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (xe *xplorProvider) Family(nodeId string, familyId string) (*xplorentities.
 	return family, nil
 
 }
-func (xe *xplorProvider) Clubs(nodeId string) (*xplorentities.XPloreClubs, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Clubs(nodeId string) (*xplorentities.XPloreClubs, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (xe *xplorProvider) Clubs(nodeId string) (*xplorentities.XPloreClubs, *xplo
 	return clubs, nil
 
 }
-func (xe *xplorProvider) Club(nodeId string, clubId string) (*xplorentities.XPlorClub, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Club(nodeId string, clubId string) (*xplorentities.XPlorClub, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (xe *xplorProvider) Club(nodeId string, clubId string) (*xplorentities.XPlo
 	return club, nil
 
 }
-func (xe *xplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPagination, timeGap *xplorentities.XPlorTimeGap) (*xplorentities.XPlorEvents, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPagination, timeGap *xplorentities.XPlorTimeGap) (*xplorentities.XPlorEvents, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -223,7 +223,7 @@ func (xe *xplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPa
 	return events, nil
 
 }
-func (xe *xplorProvider) Activities(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorActivities, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Activities(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorActivities, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (xe *xplorProvider) Activities(nodeId string, pagination *xplorentities.XPl
 
 	return activities, nil
 }
-func (xe *xplorProvider) Activity(nodeId string, activityId string) (*xplorentities.XPlorActivity, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Activity(nodeId string, activityId string) (*xplorentities.XPlorActivity, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -270,7 +270,7 @@ func (xe *xplorProvider) Activity(nodeId string, activityId string) (*xplorentit
 	return activity, nil
 
 }
-func (xd *xplorProvider) Studios(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorStudios, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) Studios(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorStudios, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -291,7 +291,7 @@ func (xd *xplorProvider) Studios(nodeId string, pagination *xplorentities.XPlorP
 	return studios, nil
 
 }
-func (xd *xplorProvider) Studio(nodeId string, studioId string) (*xplorentities.XPlorStudio, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) Studio(nodeId string, studioId string) (*xplorentities.XPlorStudio, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -318,7 +318,7 @@ func (xd *xplorProvider) Studio(nodeId string, studioId string) (*xplorentities.
 	return studio, nil
 
 }
-func (xd *xplorProvider) Contacts(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContacts, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) Contacts(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContacts, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func (xd *xplorProvider) Contacts(nodeId string, pagination *xplorentities.XPlor
 	return contacts, nil
 
 }
-func (xd *xplorProvider) Contact(nodeId string, contactId string) (*xplorentities.XPlorContact, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) Contact(nodeId string, contactId string) (*xplorentities.XPlorContact, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -366,7 +366,7 @@ func (xd *xplorProvider) Contact(nodeId string, contactId string) (*xplorentitie
 	return contact, nil
 
 }
-func (xe *xplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlorSubscriptionsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorSubscriptions, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlorSubscriptionsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorSubscriptions, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -387,7 +387,7 @@ func (xe *xplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlo
 	return subscriptions, nil
 
 }
-func (xe *xplorProvider) Subscription(nodeId string, subscriptionId string) (*xplorentities.XPlorSubscription, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Subscription(nodeId string, subscriptionId string) (*xplorentities.XPlorSubscription, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -414,7 +414,7 @@ func (xe *xplorProvider) Subscription(nodeId string, subscriptionId string) (*xp
 	return subscription, nil
 
 }
-func (xe *xplorProvider) Classes(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Classes(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -435,7 +435,7 @@ func (xe *xplorProvider) Classes(nodeId string, pagination *xplorentities.XPlorP
 	return classes, nil
 
 }
-func (xe *xplorProvider) Class(nodeId string, classId string) (*xplorentities.XPlorClass, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Class(nodeId string, classId string) (*xplorentities.XPlorClass, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -462,7 +462,7 @@ func (xe *xplorProvider) Class(nodeId string, classId string) (*xplorentities.XP
 	return class, nil
 
 }
-func (xe *xplorProvider) NetworkNodes(pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorNetworkNodes, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) NetworkNodes(pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorNetworkNodes, *xplorentities.ErrorResponse) {
 	var executor = xe.getExecutor("")
 	defer xe.putExecutor(executor)
 
@@ -479,7 +479,7 @@ func (xe *xplorProvider) NetworkNodes(pagination *xplorentities.XPlorPagination)
 
 	return networkNodes, nil
 }
-func (xe *xplorProvider) NetworkNode(nodeId string) (*xplorentities.XPlorNetworkNode, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) NetworkNode(nodeId string) (*xplorentities.XPlorNetworkNode, *xplorentities.ErrorResponse) {
 	if strings.TrimSpace(nodeId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
@@ -503,7 +503,7 @@ func (xe *xplorProvider) NetworkNode(nodeId string) (*xplorentities.XPlorNetwork
 	return networkNode, nil
 }
 
-func (xe *xplorProvider) Attendees(nodeId string, classId *string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorAttendees, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Attendees(nodeId string, classId *string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorAttendees, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -524,7 +524,7 @@ func (xe *xplorProvider) Attendees(nodeId string, classId *string, pagination *x
 	return attendees, nil
 
 }
-func (xe *xplorProvider) Coaches(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPloreCoaches, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Coaches(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPloreCoaches, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -545,7 +545,7 @@ func (xe *xplorProvider) Coaches(nodeId string, pagination *xplorentities.XPlorP
 	return coaches, nil
 
 }
-func (xe *xplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XPloreCoach, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XPloreCoach, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -572,7 +572,7 @@ func (xe *xplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XP
 	return coach, nil
 
 }
-func (xe *xplorProvider) Articles(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorArticles, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Articles(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorArticles, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -593,7 +593,7 @@ func (xe *xplorProvider) Articles(nodeId string, pagination *xplorentities.XPlor
 	return articles, nil
 
 }
-func (xe *xplorProvider) Article(nodeId string, articleId string) (*xplorentities.XPlorArticle, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Article(nodeId string, articleId string) (*xplorentities.XPlorArticle, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -620,7 +620,7 @@ func (xe *xplorProvider) Article(nodeId string, articleId string) (*xplorentitie
 	return article, nil
 
 }
-func (xe *xplorProvider) Recurrences(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Recurrences(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -641,7 +641,7 @@ func (xe *xplorProvider) Recurrences(nodeId string, pagination *xplorentities.XP
 	return recurrences, nil
 
 }
-func (xe *xplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplorentities.XPlorRecurrence, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplorentities.XPlorRecurrence, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -669,7 +669,7 @@ func (xe *xplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplore
 
 }
 
-func (xe *xplorProvider) ClassType(nodeId string, classTypeId string) (*xplorentities.XPlorClassType, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) ClassType(nodeId string, classTypeId string) (*xplorentities.XPlorClassType, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -696,7 +696,7 @@ func (xe *xplorProvider) ClassType(nodeId string, classTypeId string) (*xplorent
 	return classType, nil
 }
 
-func (xe *xplorProvider) CounterLines(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) CounterLines(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -717,7 +717,7 @@ func (xe *xplorProvider) CounterLines(nodeId string, pagination *xplorentities.X
 	return counterLines, nil
 
 }
-func (xe *xplorProvider) CounterLine(nodeId string, counterLineId string) (*xplorentities.XPlorCounterLine, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) CounterLine(nodeId string, counterLineId string) (*xplorentities.XPlorCounterLine, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -743,7 +743,7 @@ func (xe *xplorProvider) CounterLine(nodeId string, counterLineId string) (*xplo
 	return counterLine, nil
 
 }
-func (xe *xplorProvider) ContactTags(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) ContactTags(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -764,7 +764,7 @@ func (xe *xplorProvider) ContactTags(nodeId string, pagination *xplorentities.XP
 	return contactTags, nil
 
 }
-func (xe *xplorProvider) ContactTag(nodeId string, contactTagId string) (*xplorentities.XPlorContactTag, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) ContactTag(nodeId string, contactTagId string) (*xplorentities.XPlorContactTag, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -791,7 +791,7 @@ func (xe *xplorProvider) ContactTag(nodeId string, contactTagId string) (*xplore
 	return contactTag, nil
 
 }
-func (xe *xplorProvider) Users(pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorUsers, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Users(pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorUsers, *xplorentities.ErrorResponse) {
 	var executor = xe.getExecutor("")
 	defer xe.putExecutor(executor)
 
@@ -809,7 +809,7 @@ func (xe *xplorProvider) Users(pagination *xplorentities.XPlorPagination) (*xplo
 	return users, nil
 
 }
-func (xe *xplorProvider) User(userId string) (*xplorentities.XPlorUser, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) User(userId string) (*xplorentities.XPlorUser, *xplorentities.ErrorResponse) {
 	if strings.TrimSpace(userId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,

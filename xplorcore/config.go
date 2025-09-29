@@ -12,7 +12,7 @@ type neededHeaders struct {
 	Value      string
 }
 
-type XplorConfig struct {
+type xplorConfig struct {
 	Host           string
 	APIVersion     string
 	EnterpriseName string
@@ -21,8 +21,8 @@ type XplorConfig struct {
 	NeededHeaders  []neededHeaders
 }
 
-func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string) *XplorConfig {
-	var config = &XplorConfig{
+func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string) *xplorConfig {
+	var config = &xplorConfig{
 		Host:           host,
 		APIVersion:     apiVersion,
 		EnterpriseName: enterpriseName,
@@ -39,7 +39,7 @@ func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientS
 	return config
 }
 
-func (xc *XplorConfig) generateRequest(method string, uri string, optionalHeaders map[string]string, queryParams url.Values, params url.Values) *http.Request {
+func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeaders map[string]string, queryParams url.Values, params url.Values) *http.Request {
 	request := &http.Request{
 		Method: method,
 		URL: &url.URL{
