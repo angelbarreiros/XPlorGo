@@ -9,11 +9,11 @@ type UserProperties struct {
 }
 
 type XPlorUsers struct {
-	Context    *string      `json:"@context"`
-	ID         *string      `json:"@id"`
-	Type       *string      `json:"@type"`
-	Users      []XPlorUser  `json:"hydra:member"`
-	Pagination *HydraSearch `json:"hydra:view"`
+	Context    *string     `json:"@context"`
+	ID         *string     `json:"@id"`
+	Type       *string     `json:"@type"`
+	Users      []XPlorUser `json:"hydra:member"`
+	Pagination HydraView   `json:"hydra:view"`
 	// Search can be added if needed
 }
 
