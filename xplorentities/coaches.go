@@ -36,3 +36,7 @@ func (c XPloreCoach) ActivityIDs() []string {
 	}
 	return ids
 }
+
+func (c XPloreCoach) CoachID() (int, error) {
+	return ExtractIDInt(c.Id, "coach ID field is nil")
+}
