@@ -2,8 +2,10 @@ package xplorentities
 
 import (
 	"errors"
+	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/angelbarreiros/XPlorGo/util"
 )
@@ -196,6 +198,9 @@ func (rc *XPlorRecurrences) CollectionID() (string, error) {
 func (rc *XPlorRecurrences) ContextID() (string, error) {
 	return ExtractIDFromString(rc.Context, "context ID field is empty")
 }
+func (rc *XPlorRecurrence) IsActive() bool {
+	return rc.DeletedAt == nil && rc.EndedAt.Time.After(time.Now())
+}
 
 // Método para obtener todos los IDs de recurrencia en la colección
 func (rc *XPlorRecurrences) AllRecurrenceIDs() ([]string, error) {
@@ -275,4 +280,53 @@ func (rc *XPlorRecurrences) AllClubIDs() ([]string, error) {
 	}
 
 	return clubIDs, nil
+}
+
+// XPlorRecurrencesParams represents the search parameters for recurrences
+type XPlorRecurrencesParams struct {
+	StartedAtBefore         *time.Time
+	StartedAtStrictlyBefore *time.Time
+	StartedAtAfter          *time.Time
+	StartedAtStrictlyAfter  *time.Time
+	EndedAtBefore           *time.Time
+	EndedAtStrictlyBefore   *time.Time
+	EndedAtAfter            *time.Time
+	EndedAtStrictlyAfter    *time.Time
+	Week                    string
+}
+
+// ToValues converts the params to url.Values for query parameters
+func (p XPlorRecurrencesParams) ToValues(values *url.Values) {
+	// StartedAt date filters
+	if p.StartedAtBefore != nil {
+		values.Set("startedAt[before]", p.StartedAtBefore.Format("2006-01-02T15:04:05"))
+	}
+	if p.StartedAtStrictlyBefore != nil {
+		values.Set("startedAt[strictly_before]", p.StartedAtStrictlyBefore.Format("2006-01-02T15:04:05"))
+	}
+	if p.StartedAtAfter != nil {
+		values.Set("startedAt[after]", p.StartedAtAfter.Format("2006-01-02T15:04:05"))
+	}
+	if p.StartedAtStrictlyAfter != nil {
+		values.Set("startedAt[strictly_after]", p.StartedAtStrictlyAfter.Format("2006-01-02T15:04:05"))
+	}
+
+	// EndedAt date filters
+	if p.EndedAtBefore != nil {
+		values.Set("endedAt[before]", p.EndedAtBefore.Format("2006-01-02T15:04:05"))
+	}
+	if p.EndedAtStrictlyBefore != nil {
+		values.Set("endedAt[strictly_before]", p.EndedAtStrictlyBefore.Format("2006-01-02T15:04:05"))
+	}
+	if p.EndedAtAfter != nil {
+		values.Set("endedAt[after]", p.EndedAtAfter.Format("2006-01-02T15:04:05"))
+	}
+	if p.EndedAtStrictlyAfter != nil {
+		values.Set("endedAt[strictly_after]", p.EndedAtStrictlyAfter.Format("2006-01-02T15:04:05"))
+	}
+
+	// Week filter
+	if p.Week != "" {
+		values.Set("week", p.Week)
+	}
 }

@@ -620,7 +620,7 @@ func (xe *XplorProvider) Article(nodeId string, articleId string) (*xplorentitie
 	return article, nil
 
 }
-func (xe *XplorProvider) Recurrences(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Recurrences(nodeId string, params *xplorentities.XPlorRecurrencesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -630,7 +630,7 @@ func (xe *XplorProvider) Recurrences(nodeId string, pagination *xplorentities.XP
 	if err := xe.authenticateIfNeeded(executor); err != nil {
 		return nil, err
 	}
-	recurrences, err := executor.recurrences(xe.token.Token.AccessToken, pagination)
+	recurrences, err := executor.recurrences(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,

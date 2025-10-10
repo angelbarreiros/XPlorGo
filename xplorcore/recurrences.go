@@ -9,13 +9,16 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-func (xe xplorExecutor) recurrences(accesToken string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) recurrences(accesToken string, params *xplorentities.XPlorRecurrencesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
 	resultChan := make(chan util.RequestResult[*xplorentities.XPlorRecurrences], 1)
 
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
+		if params != nil {
+			params.ToValues(&queryParams)
+		}
 		formData := url.Values{}
 		formData.Set("client_id", xe.config.ClientID)
 		formData.Set("client_secret", xe.config.ClientSecret)
