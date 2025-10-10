@@ -833,3 +833,51 @@ func (xe *XplorProvider) User(userId string) (*xplorentities.XPlorUser, *xploren
 	return user, nil
 
 }
+func (xe *XplorProvider) Zones(nodeId string, params *xplorentities.XPlorZonesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorZones, *xplorentities.ErrorResponse) {
+	if err := checkNodeId(nodeId); err != nil {
+		return nil, err
+	}
+	var executor = xe.getExecutor(nodeId)
+	defer xe.putExecutor(executor)
+
+	if err := xe.authenticateIfNeeded(executor); err != nil {
+		return nil, err
+	}
+	zones, err := executor.zones(xe.token.Token.AccessToken, params, pagination)
+	if err != nil {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    err.Code,
+			Message: "Failed to get zones: " + err.Message,
+		}
+	}
+
+	return zones, nil
+
+}
+func (xe *XplorProvider) Zone(nodeId string, zoneId string) (*xplorentities.XPlorZone, *xplorentities.ErrorResponse) {
+	if err := checkNodeId(nodeId); err != nil {
+		return nil, err
+	}
+	if strings.TrimSpace(zoneId) == "" {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Zone ID is required",
+		}
+	}
+	var executor = xe.getExecutor(nodeId)
+	defer xe.putExecutor(executor)
+
+	if err := xe.authenticateIfNeeded(executor); err != nil {
+		return nil, err
+	}
+	zone, err := executor.zone(xe.token.Token.AccessToken, zoneId)
+	if err != nil {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    err.Code,
+			Message: "Failed to get zone: " + err.Message,
+		}
+	}
+
+	return zone, nil
+
+}
