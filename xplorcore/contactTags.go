@@ -9,13 +9,16 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-func (xe xplorExecutor) contactTags(accesToken string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) contactTags(accesToken string, params *xplorentities.XPlorContactTagsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
 	resultChan := make(chan util.RequestResult[*xplorentities.XPlorContactTags], 1)
 
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
+		if params != nil {
+			params.ToValues(&queryParams)
+		}
 		formData := url.Values{}
 		formData.Set("client_id", xe.config.ClientID)
 		formData.Set("client_secret", xe.config.ClientSecret)

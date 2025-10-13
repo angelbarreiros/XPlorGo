@@ -24,7 +24,7 @@ type XPlorActivity struct {
 	ClubId             *string            `json:"clubId"`
 	ColorHex           string             `json:"colorHex"`
 	Durations          []string           `json:"durations"`
-	CreatedAt          util.LocalTime     `json:"createdAt"`
+	CreatedAt          *util.LocalTime    `json:"createdAt"`
 	CreatedBy          string             `json:"createdBy"`
 	TemplateToken      *string            `json:"templateToken"`
 	ShowcaseActivities []ShowcaseActivity `json:"showcaseActivities"`

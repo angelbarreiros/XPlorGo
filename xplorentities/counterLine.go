@@ -16,12 +16,12 @@ type XPlorCounterLine struct {
 	Unit              *string                     `json:"unit"`
 	TotalUnities      int                         `json:"totalUnities"`
 	RemainingUnities  int                         `json:"remainingUnities"`
-	ValidFrom         util.LocalTime              `json:"validFrom"`
-	ValidThrough      util.LocalTime              `json:"validThrough"`
+	ValidFrom         *util.LocalTime             `json:"validFrom"`
+	ValidThrough      *util.LocalTime             `json:"validThrough"`
 	CounterMovements  []string                    `json:"counterMovements"`
 	ArticleID         *string                     `json:"articleId"`
 	ServiceProperty   *CounterLineServiceProperty `json:"serviceProperty,omitempty"`
-	CreatedAt         util.LocalTime              `json:"createdAt"`
+	CreatedAt         *util.LocalTime             `json:"createdAt"`
 	CreatedBy         string                      `json:"createdBy"`
 	UpdatedAt         util.LocalTime              `json:"updatedAt"`
 	DeletedAt         *util.LocalTime             `json:"deletedAt,omitempty"`

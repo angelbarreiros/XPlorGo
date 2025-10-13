@@ -318,7 +318,7 @@ func (xd *XplorProvider) Studio(nodeId string, studioId string) (*xplorentities.
 	return studio, nil
 
 }
-func (xd *XplorProvider) Contacts(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContacts, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) Contacts(nodeId string, params *xplorentities.XPlorContactsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContacts, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -328,7 +328,7 @@ func (xd *XplorProvider) Contacts(nodeId string, pagination *xplorentities.XPlor
 	if err := xd.authenticateIfNeeded(executor); err != nil {
 		return nil, err
 	}
-	contacts, err := executor.contacts(xd.token.Token.AccessToken, pagination)
+	contacts, err := executor.contacts(xd.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
@@ -743,7 +743,7 @@ func (xe *XplorProvider) CounterLine(nodeId string, counterLineId string) (*xplo
 	return counterLine, nil
 
 }
-func (xe *XplorProvider) ContactTags(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) ContactTags(nodeId string, params *xplorentities.XPlorContactTagsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -753,7 +753,7 @@ func (xe *XplorProvider) ContactTags(nodeId string, pagination *xplorentities.XP
 	if err := xe.authenticateIfNeeded(executor); err != nil {
 		return nil, err
 	}
-	contactTags, err := executor.contactTags(xe.token.Token.AccessToken, pagination)
+	contactTags, err := executor.contactTags(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,

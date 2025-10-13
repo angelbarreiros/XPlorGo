@@ -35,13 +35,13 @@ type XPlorEvent struct {
 	OnlineLimit                        *int            `json:"onlineLimit"`
 	ExternalQuota                      *string         `json:"externalQuota"`
 	CoachAvailable                     bool            `json:"coachAvailable"`
-	StartedAt                          util.LocalTime  `json:"startedAt"`
-	EndedAt                            util.LocalTime  `json:"endedAt"`
+	StartedAt                          *util.LocalTime `json:"startedAt"`
+	EndedAt                            *util.LocalTime `json:"endedAt"`
 	Summary                            string          `json:"summary"`
 	Description                        *string         `json:"description"`
-	CreatedAt                          util.LocalTime  `json:"createdAt"`
+	CreatedAt                          *util.LocalTime `json:"createdAt"`
 	CreatedBy                          string          `json:"createdBy"`
-	UpdatedAt                          util.LocalTime  `json:"updatedAt"`
+	UpdatedAt                          *util.LocalTime `json:"updatedAt"`
 	UpdatedBy                          string          `json:"updatedBy"`
 	DeletedAt                          *util.LocalTime `json:"deletedAt"`
 	DeletedBy                          *string         `json:"deletedBy"`

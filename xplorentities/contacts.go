@@ -2,6 +2,7 @@ package xplorentities
 
 import (
 	"errors"
+	"net/url"
 	"strings"
 	"time"
 
@@ -15,45 +16,46 @@ type XPlorContacts struct {
 	Type       string         `json:"@type"`
 	Contacts   []XPlorContact `json:"hydra:member"`
 	Pagination *HydraView     `json:"hydra:view,omitempty"`
+	Search     *HydraSearch   `json:"hydra:search,omitempty"`
 }
 
 // Entidad Contact
 type XPlorContact struct {
-	ID                      *string        `json:"@id"`
-	Type                    string         `json:"@type"`
-	Number                  string         `json:"number"`
-	Address                 XPlorAddress   `json:"address"`
-	BirthDate               util.LocalDate `json:"birthDate"`
-	Email                   string         `json:"email"`
-	FamilyName              string         `json:"familyName"`
-	Gender                  string         `json:"gender"`
-	GivenName               string         `json:"givenName"`
-	PictureID               *string        `json:"pictureId"`
-	ClubID                  *string        `json:"clubId"`
-	Mobile                  *string        `json:"mobile"`
-	SourceID                *string        `json:"sourceId"`
-	PrescriberID            *string        `json:"prescriberId"`
-	OccupationID            *string        `json:"occupationId"`
-	GoalID                  *string        `json:"goalId"`
-	GoalIDs                 []*string      `json:"goalIds"`
-	MotivationID            *string        `json:"motivationId"`
-	MotivationIDs           []*string      `json:"motivationIds"`
-	CompanyID               *string        `json:"companyId"`
-	IdentificationValidated bool           `json:"identificationValidated"`
-	State                   string         `json:"state"`
-	InitialSalepersonID     *string        `json:"initialSalepersonId"`
-	CurrentSalepersonID     *string        `json:"currentSalepersonId"`
-	CurrentSalepersonGiven  string         `json:"currentSalepersonGivenName"`
-	CurrentSalepersonFamily string         `json:"currentSalepersonFamilyName"`
-	CreatedAt               util.LocalTime `json:"createdAt"`
-	UpdatedAt               util.LocalTime `json:"updatedAt"`
-	PictureAllowed          *bool          `json:"pictureAllowed"`
-	SponsorshipCode         string         `json:"sponsorshipCode"`
-	ExternalID              *string        `json:"externalId"`
-	NationalID              string         `json:"nationalId"`
-	NationalIdDocumentID    *string        `json:"nationalIdDocumentId"`
-	ProspectingState        *string        `json:"prospectingState"`
-	Channel                 string         `json:"channel"`
+	ID                      *string         `json:"@id"`
+	Type                    string          `json:"@type"`
+	Number                  string          `json:"number"`
+	Address                 XPlorAddress    `json:"address"`
+	BirthDate               *util.LocalDate `json:"birthDate"`
+	Email                   string          `json:"email"`
+	FamilyName              string          `json:"familyName"`
+	Gender                  string          `json:"gender"`
+	GivenName               string          `json:"givenName"`
+	PictureID               *string         `json:"pictureId"`
+	ClubID                  *string         `json:"clubId"`
+	Mobile                  *string         `json:"mobile"`
+	SourceID                *string         `json:"sourceId"`
+	PrescriberID            *string         `json:"prescriberId"`
+	OccupationID            *string         `json:"occupationId"`
+	GoalID                  *string         `json:"goalId"`
+	GoalIDs                 []*string       `json:"goalIds"`
+	MotivationID            *string         `json:"motivationId"`
+	MotivationIDs           []*string       `json:"motivationIds"`
+	CompanyID               *string         `json:"companyId"`
+	IdentificationValidated bool            `json:"identificationValidated"`
+	State                   string          `json:"state"`
+	InitialSalepersonID     *string         `json:"initialSalepersonId"`
+	CurrentSalepersonID     *string         `json:"currentSalepersonId"`
+	CurrentSalepersonGiven  string          `json:"currentSalepersonGivenName"`
+	CurrentSalepersonFamily string          `json:"currentSalepersonFamilyName"`
+	CreatedAt               *util.LocalTime `json:"createdAt"`
+	UpdatedAt               *util.LocalTime `json:"updatedAt"`
+	PictureAllowed          *bool           `json:"pictureAllowed"`
+	SponsorshipCode         string          `json:"sponsorshipCode"`
+	ExternalID              *string         `json:"externalId"`
+	NationalID              string          `json:"nationalId"`
+	NationalIdDocumentID    *string         `json:"nationalIdDocumentId"`
+	ProspectingState        *string         `json:"prospectingState"`
+	Channel                 string          `json:"channel"`
 }
 
 // Substruct para Address
@@ -129,4 +131,80 @@ func (c XPlorContact) Age() (*int, error) {
 	}
 
 	return &age, nil
+}
+
+// XPlorContactsParams represents the search parameters for contacts
+type XPlorContactsParams struct {
+	ContactID  string
+	ContactIDs []string
+	ClubID     string
+	ClubIDs    []string
+	State      string
+	States     []string
+	Email      string
+	Emails     []string
+	Mobile     string
+	Number     string
+	FamilyName string
+	GivenName  string
+}
+
+// ToValues converts the params to url.Values for query parameters
+func (p XPlorContactsParams) ToValues(values *url.Values) {
+	// Contact ID filters
+	contactID := strings.TrimSpace(p.ContactID)
+	if contactID != "" {
+		values.Set("id", contactID)
+	}
+	for _, id := range p.ContactIDs {
+		if strings.TrimSpace(id) != "" {
+			values.Add("id[]", id)
+		}
+	}
+
+	// Club filters
+	clubID := strings.TrimSpace(p.ClubID)
+	if clubID != "" {
+		values.Set("clubId", clubID)
+	}
+	for _, id := range p.ClubIDs {
+		if strings.TrimSpace(id) != "" {
+			values.Add("clubId[]", id)
+		}
+	}
+
+	// State filters
+	state := strings.TrimSpace(p.State)
+	if state != "" {
+		values.Set("state", state)
+	}
+	for _, s := range p.States {
+		if strings.TrimSpace(s) != "" {
+			values.Add("state[]", s)
+		}
+	}
+
+	// Email filters
+	if p.Email != "" {
+		values.Set("email", p.Email)
+	}
+	for _, email := range p.Emails {
+		if strings.TrimSpace(email) != "" {
+			values.Add("email[]", email)
+		}
+	}
+
+	// Other contact info filters
+	if p.Mobile != "" {
+		values.Set("mobile", p.Mobile)
+	}
+	if p.Number != "" {
+		values.Set("number", p.Number)
+	}
+	if p.FamilyName != "" {
+		values.Set("familyName", p.FamilyName)
+	}
+	if p.GivenName != "" {
+		values.Set("givenName", p.GivenName)
+	}
 }

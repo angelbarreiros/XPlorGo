@@ -3,6 +3,7 @@ package xplorentities
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/angelbarreiros/XPlorGo/util"
@@ -19,7 +20,7 @@ type XPlorContactTag struct {
 	Name               string          `json:"name"`
 	ValidFrom          util.LocalTime  `json:"validFrom"`
 	ValidThrough       *util.LocalTime `json:"validThrough,omitempty"`
-	CreatedAt          util.LocalTime  `json:"createdAt"`
+	CreatedAt          *util.LocalTime `json:"createdAt"`
 	DeletedAt          *util.LocalTime `json:"deletedAt,omitempty"`
 	DeletedBy          interface{}     `json:"deletedBy,omitempty"`
 }
@@ -251,4 +252,63 @@ func (c *XPlorContactTag) String() string {
 		return "nil"
 	}(), c.IsActive())
 
+}
+
+// XPlorContactTagsParams represents the search parameters for contact tags
+type XPlorContactTagsParams struct {
+	ContactID      string
+	ContactIDs     []string
+	Email          string
+	Emails         []string
+	TagName        string
+	TagNames       []string
+	SubscriptionID string
+	Active         *bool
+}
+
+// ToValues converts the params to url.Values for query parameters
+func (p XPlorContactTagsParams) ToValues(values *url.Values) {
+	// Contact ID filters
+	if p.ContactID != "" {
+		values.Set("contact", p.ContactID)
+	}
+	for _, id := range p.ContactIDs {
+		if id != "" {
+			values.Add("contact[]", id)
+		}
+	}
+
+	// Email filters - assuming the API supports filtering by contact email
+	if p.Email != "" {
+		values.Set("contact.email", p.Email)
+	}
+	for _, email := range p.Emails {
+		if email != "" {
+			values.Add("contact.email[]", email)
+		}
+	}
+
+	// Tag name filters
+	if p.TagName != "" {
+		values.Set("name", p.TagName)
+	}
+	for _, name := range p.TagNames {
+		if name != "" {
+			values.Add("name[]", name)
+		}
+	}
+
+	// Subscription ID filter
+	if p.SubscriptionID != "" {
+		values.Set("subscription", p.SubscriptionID)
+	}
+
+	// Active filter
+	if p.Active != nil {
+		if *p.Active {
+			values.Set("active", "true")
+		} else {
+			values.Set("active", "false")
+		}
+	}
 }

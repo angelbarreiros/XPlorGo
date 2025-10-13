@@ -40,7 +40,7 @@ type XPlorArticle struct {
 	TaxRate                   float64           `json:"taxRate"`
 	ArticleBehaviors          []ArticleBehavior `json:"articleBehaviors"`
 	Parent                    interface{}       `json:"parent"`
-	CreatedAt                 util.LocalTime    `json:"createdAt"`
+	CreatedAt                 *util.LocalTime   `json:"createdAt"`
 	CreatedBy                 string            `json:"createdBy"`
 	DeletedAt                 *util.LocalTime   `json:"deletedAt"`
 	DeletedBy                 interface{}       `json:"deletedBy"`
