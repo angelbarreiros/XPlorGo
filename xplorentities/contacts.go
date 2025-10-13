@@ -71,33 +71,33 @@ type XPlorAddress struct {
 
 // Métodos helpers para extraer IDs -----------------
 
-func (c XPlorContact) ContactID() (int, error) {
-	return ExtractIDInt(c.ID, "contact ID field is nil")
+func (c XPlorContact) ContactID() (string, error) {
+	return ExtractID(c.ID, "contact ID field is nil")
 }
 
-func (c XPlorContact) ClubIDValue() (int, error) {
-	return ExtractIDInt(c.ClubID, "club ID field is nil")
+func (c XPlorContact) ClubIDValue() (string, error) {
+	return ExtractID(c.ClubID, "club ID field is nil")
 }
 
-func (c XPlorContact) PictureIDValue() (int, error) {
-	return ExtractIDInt(c.PictureID, "picture ID field is nil")
+func (c XPlorContact) PictureIDValue() (string, error) {
+	return ExtractID(c.PictureID, "picture ID field is nil")
 }
 
-func (c XPlorContact) GoalIDValue() (int, error) {
-	return ExtractIDInt(c.GoalID, "goal ID field is nil")
+func (c XPlorContact) GoalIDValue() (string, error) {
+	return ExtractID(c.GoalID, "goal ID field is nil")
 }
 
-func (c XPlorContact) InitialSalepersonIDValue() (int, error) {
-	return ExtractIDInt(c.InitialSalepersonID, "initial salesperson ID field is nil")
+func (c XPlorContact) InitialSalepersonIDValue() (string, error) {
+	return ExtractID(c.InitialSalepersonID, "initial salesperson ID field is nil")
 }
 
-func (c XPlorContact) CurrentSalepersonIDValue() (int, error) {
-	return ExtractIDInt(c.CurrentSalepersonID, "current salesperson ID field is nil")
+func (c XPlorContact) CurrentSalepersonIDValue() (string, error) {
+	return ExtractID(c.CurrentSalepersonID, "current salesperson ID field is nil")
 }
 
 // Para Address
-func (a XPlorAddress) AddressID() (int, error) {
-	return ExtractIDInt(a.ID, "address ID field is nil")
+func (a XPlorAddress) AddressID() (string, error) {
+	return ExtractID(a.ID, "address ID field is nil")
 }
 
 // Helper para concatenar dirección completa
