@@ -414,7 +414,7 @@ func (xe *XplorProvider) Subscription(nodeId string, subscriptionId string) (*xp
 	return subscription, nil
 
 }
-func (xe *XplorProvider) Classes(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Classes(nodeId string, params *xplorentities.XPlorClassesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
@@ -424,7 +424,7 @@ func (xe *XplorProvider) Classes(nodeId string, pagination *xplorentities.XPlorP
 	if err := xe.authenticateIfNeeded(executor); err != nil {
 		return nil, err
 	}
-	classes, err := executor.classes(xe.token.Token.AccessToken, pagination)
+	classes, err := executor.classes(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
