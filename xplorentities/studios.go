@@ -21,7 +21,7 @@ type XPlorStudio struct {
 	Type            string          `json:"@type"` // "Studio"
 	Name            string          `json:"name"`
 	Club            *string         `json:"club"`   // ej: "/enjoy/clubs/1249"
-	ZoneID          *string         `json:"zoneId"` // puede ser null
+	ZoneId          *string         `json:"zoneId"` // puede ser null
 	Capacity        *int            `json:"capacity"`
 	Overbooking     *int            `json:"overbooking"`
 	StreetAddress   string          `json:"streetAddress"`
@@ -40,6 +40,9 @@ type XPlorStudio struct {
 // StudioID devuelve el número final del @id, ej: "/enjoy/studios/2552" → 2552
 func (s XPlorStudio) StudioID() (string, error) {
 	return ExtractID(s.ID, "studio ID field is nil")
+}
+func (s XPlorStudio) ZoneID() (string, error) {
+	return ExtractID(s.ZoneId, "studio ZoneID field is nil")
 }
 
 // ClubID devuelve el número final del club, ej: "/enjoy/clubs/1249" → "1249"
