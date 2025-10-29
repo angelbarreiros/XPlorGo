@@ -1,6 +1,10 @@
 package xplorentities
 
-import "path"
+import (
+	"path"
+
+	"github.com/angelbarreiros/XPlorGo/util"
+)
 
 type XPloreCoaches struct {
 	Context    *string       `json:"@context"`
@@ -11,18 +15,18 @@ type XPloreCoaches struct {
 }
 
 type XPloreCoach struct {
-	Id            *string   `json:"@id"`
-	Type          *string   `json:"@type"`
-	GivenName     *string   `json:"givenName"`
-	FamilyName    *string   `json:"familyName"`
-	AlternateName *string   `json:"alternateName"`
-	Email         *string   `json:"email"`
-	Mobile        *string   `json:"mobile"`
-	Activities    []*string `json:"activities"`
-	CreatedAt     *string   `json:"createdAt"`
-	CreatedBy     *string   `json:"createdBy"`
-	ArchivedAt    *string   `json:"archivedAt"`
-	ArchivedBy    *string   `json:"archivedBy"`
+	Id            *string         `json:"@id"`
+	Type          *string         `json:"@type"`
+	GivenName     *string         `json:"givenName"`
+	FamilyName    *string         `json:"familyName"`
+	AlternateName *string         `json:"alternateName"`
+	Email         *string         `json:"email"`
+	Mobile        *string         `json:"mobile"`
+	Activities    []*string       `json:"activities"`
+	CreatedAt     *util.LocalTime `json:"createdAt"`
+	CreatedBy     *string         `json:"createdBy"`
+	ArchivedAt    *string         `json:"archivedAt"`
+	ArchivedBy    *string         `json:"archivedBy"`
 }
 
 func (c XPloreCoach) ActivityIDs() []string {

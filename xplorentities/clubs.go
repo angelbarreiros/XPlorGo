@@ -3,6 +3,8 @@ package xplorentities
 import (
 	"fmt"
 	"strings"
+
+	"github.com/angelbarreiros/XPlorGo/util"
 )
 
 type XPloreClubs struct {
@@ -14,29 +16,29 @@ type XPloreClubs struct {
 }
 
 type XPlorClub struct {
-	ID                string        `json:"@id"` // Cambiado de *string a string (no nullable según spec)
-	Type              string        `json:"@type"`
-	Context           interface{}   `json:"@context"`          // Agregado, interface{} para string or object
-	ClubNumberID      int           `json:"id"`                // Cambiado de ClubNumberID a id para coincidir
-	Number            *string       `json:"number"`            // Nullable, string [3..7] chars
-	Code              string        `json:"code"`              // Required, string [3..5] chars
-	Name              string        `json:"name"`              // Required
-	Email             *string       `json:"email"`             // Nullable, string <email>
-	Phone             *string       `json:"phone"`             // Nullable
-	StreetAddress     *string       `json:"streetAddress"`     // Nullable
-	PostalCode        string        `json:"postalCode"`        // Required
-	AddressLocality   string        `json:"addressLocality"`   // Required
-	AddressCountry    string        `json:"addressCountry"`    // Required
-	AddressCountryIso string        `json:"addressCountryIso"` // Required
-	OpeningDate       *string       `json:"openingDate"`       // Nullable, string <date-time> (cambiado de *util.LocalTime)
-	Description       *string       `json:"description"`       // Nullable
-	ClubTags          []ClubTag     `json:"clubTags"`          // Required, Array of object (definir ClubTag si no existe)
-	PublicMetadata    *ClubMetadata `json:"publicMetadata"`    // Nullable, object (definir ClubMetadata)
-	Locale            *string       `json:"locale"`            // Nullable
-	SaleTerms         []SaleTerms   `json:"saleTerms"`         // Required, Array of object (definir SaleTerms)
-	CreatedAt         string        `json:"createdAt"`         // Required, string <date-time> (cambiado de util.LocalTime)
-	CreatedBy         string        `json:"createdBy"`         // Required
-	DeletedAt         *string       `json:"deletedAt"`         // Nullable, string <date-time>
+	ID                string          `json:"@id"` // Cambiado de *string a string (no nullable según spec)
+	Type              string          `json:"@type"`
+	Context           interface{}     `json:"@context"`          // Agregado, interface{} para string or object
+	ClubNumberID      int             `json:"id"`                // Cambiado de ClubNumberID a id para coincidir
+	Number            *string         `json:"number"`            // Nullable, string [3..7] chars
+	Code              string          `json:"code"`              // Required, string [3..5] chars
+	Name              string          `json:"name"`              // Required
+	Email             *string         `json:"email"`             // Nullable, string <email>
+	Phone             *string         `json:"phone"`             // Nullable
+	StreetAddress     *string         `json:"streetAddress"`     // Nullable
+	PostalCode        string          `json:"postalCode"`        // Required
+	AddressLocality   string          `json:"addressLocality"`   // Required
+	AddressCountry    string          `json:"addressCountry"`    // Required
+	AddressCountryIso string          `json:"addressCountryIso"` // Required
+	OpeningDate       *string         `json:"openingDate"`       // Nullable, string <date-time> (cambiado de *util.LocalTime)
+	Description       *string         `json:"description"`       // Nullable
+	ClubTags          []ClubTag       `json:"clubTags"`          // Required, Array of object (definir ClubTag si no existe)
+	PublicMetadata    *ClubMetadata   `json:"publicMetadata"`    // Nullable, object (definir ClubMetadata)
+	Locale            *string         `json:"locale"`            // Nullable
+	SaleTerms         []SaleTerms     `json:"saleTerms"`         // Required, Array of object (definir SaleTerms)
+	CreatedAt         *util.LocalTime `json:"createdAt"`         // Required, string <date-time> (cambiado de util.LocalTime)
+	CreatedBy         string          `json:"createdBy"`         // Required
+	DeletedAt         *string         `json:"deletedAt"`         // Nullable, string <date-time>
 
 }
 
