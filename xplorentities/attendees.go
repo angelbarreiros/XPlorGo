@@ -174,7 +174,7 @@ func (xt *XTime) UnmarshalJSON(b []byte) error {
 	}
 
 	// probar sin zona
-	t, err = time.Parse("2006-01-02T15:04:05", s)
+	t, err = time.Parse("2006-01-02 15:04:05", s)
 	if err == nil {
 		xt.Time = t
 		return nil
