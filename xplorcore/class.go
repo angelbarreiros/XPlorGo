@@ -17,8 +17,7 @@ func (xe xplorExecutor) classes(accesToken string, params *xplorentities.XPlorCl
 	go func() {
 		var queryParams = xplorentities.BuildClassesWithPaginationQueryParams(params, pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/class_events", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorClasses](ctxWithTimeout, xe.client, request)
@@ -46,8 +45,7 @@ func (xe xplorExecutor) class(accesToken string, classId string) (*xplorentities
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/class_events/"+classId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorClass](ctxWithTimeout, xe.client, request)

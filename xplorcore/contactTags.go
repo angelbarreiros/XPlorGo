@@ -20,8 +20,7 @@ func (xe xplorExecutor) contactTags(accesToken string, params *xplorentities.XPl
 			params.ToValues(&queryParams)
 		}
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/contact_tags", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorContactTags](ctxWithTimeout, xe.client, request)
@@ -49,8 +48,7 @@ func (xe xplorExecutor) contactTag(accesToken string, contacTagId string) (*xplo
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/contact_tags/"+contacTagId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorContactTag](ctxWithTimeout, xe.client, request)

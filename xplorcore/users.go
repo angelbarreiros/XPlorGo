@@ -17,8 +17,7 @@ func (xe xplorExecutor) users(accesToken string, pagination *xplorentities.XPlor
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/users", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorUsers](ctxWithTimeout, xe.client, request)
@@ -46,8 +45,7 @@ func (xe xplorExecutor) user(accesToken string, userId string) (*xplorentities.X
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/users/"+userId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorUser](ctxWithTimeout, xe.client, request)

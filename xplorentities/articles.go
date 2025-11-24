@@ -61,7 +61,7 @@ type XPlorArticle struct {
 	RegistrationFeeDiscountTE float64           `json:"registrationFeeDiscountTE"`
 	TotalTE                   float64           `json:"totalTE"`
 	TotalTI                   float64           `json:"totalTI"`
-	TotalTaxes                map[string]string `json:"totalTaxes"`
+	TotalTaxes                any               `json:"totalTaxes"`
 	InvoiceReference          string            `json:"invoiceReference"`
 	ContactFamilyName         string            `json:"contactFamilyName"`
 	ContactGivenName          string            `json:"contactGivenName"`

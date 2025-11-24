@@ -17,8 +17,7 @@ func (xe xplorExecutor) counterLines(accesToken string, pagination *xplorentitie
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/counter_lines", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorCounterLines](ctxWithTimeout, xe.client, request)
@@ -46,8 +45,7 @@ func (xe xplorExecutor) counterLine(accesToken string, familyId string) (*xplore
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/counter_lines/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorCounterLine](ctxWithTimeout, xe.client, request)

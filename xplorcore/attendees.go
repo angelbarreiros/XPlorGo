@@ -18,8 +18,7 @@ func (xe xplorExecutor) attendees(accesToken string, classId *string, pagination
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		util.AddQueryParam("class_id", classId, &queryParams)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/attendees", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorAttendees](ctxWithTimeout, xe.client, request)

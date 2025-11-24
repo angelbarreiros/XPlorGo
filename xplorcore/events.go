@@ -17,8 +17,7 @@ func (xe xplorExecutor) events(accesToken string, pagination *xplorentities.XPlo
 	go func() {
 		var queryParams = xplorentities.BuildPaginationAndTimeGapParams(pagination, timeGap)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/events", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorEvents](ctxWithTimeout, xe.client, request)

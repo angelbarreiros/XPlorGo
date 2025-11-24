@@ -17,8 +17,7 @@ func (xe xplorExecutor) clubs(accesToken string, pagination *xplorentities.XPlor
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/clubs", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPloreClubs](ctxWithTimeout, xe.client, request)
@@ -47,8 +46,7 @@ func (xe xplorExecutor) club(accesToken string, clubId string) (*xplorentities.X
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/clubs/"+clubId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorClub](ctxWithTimeout, xe.client, request)

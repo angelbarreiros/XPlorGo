@@ -16,8 +16,7 @@ func (xe xplorExecutor) classType(accesToken string, classTypeId string) (*xplor
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/class_event_types/"+classTypeId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorClassType](ctxWithTimeout, xe.client, request)

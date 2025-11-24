@@ -17,8 +17,7 @@ func (xe xplorExecutor) coaches(accesToken string, pagination *xplorentities.XPl
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/coaches", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPloreCoaches](ctxWithTimeout, xe.client, request)
@@ -46,8 +45,7 @@ func (xe xplorExecutor) coach(accesToken string, familyId string) (*xplorentitie
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/coaches/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPloreCoach](ctxWithTimeout, xe.client, request)

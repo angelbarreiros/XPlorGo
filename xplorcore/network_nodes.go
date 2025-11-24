@@ -17,8 +17,7 @@ func (xe xplorExecutor) networkNodes(accesToken string, pagination *xplorentitie
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/network_nodes", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorNetworkNodes](ctxWithTimeout, xe.client, request)
@@ -46,8 +45,7 @@ func (xe xplorExecutor) networkNode(accesToken string, networkId string) (*xplor
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/network_nodes/"+networkId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorNetworkNode](ctxWithTimeout, xe.client, request)

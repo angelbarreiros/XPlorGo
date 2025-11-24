@@ -22,6 +22,7 @@ func (xe xplorExecutor) authenticate() (*xplorentities.XPlorTokenResponse, *xplo
 		formData.Set("grant_type", "client_credentials")
 		formData.Set("client_id", xe.config.ClientID)
 		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodPost, "/oauth/v2/token", header, nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorTokenResponse](ctxWithTimeout, xe.client, request)

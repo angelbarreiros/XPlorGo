@@ -20,8 +20,7 @@ func (xe xplorExecutor) contacts(accesToken string, params *xplorentities.XPlorC
 			params.ToValues(&queryParams)
 		}
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/contacts", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorContacts](ctxWithTimeout, xe.client, request)
@@ -49,8 +48,7 @@ func (xe xplorExecutor) contact(accesToken string, familyId string) (*xplorentit
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/contacts/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorContact](ctxWithTimeout, xe.client, request)

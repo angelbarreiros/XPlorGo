@@ -13,21 +13,24 @@ var xplorProviderInstace *XplorProvider = nil
 var syncOnce sync.Once
 
 type XplorProvider struct {
-	providers *sync.Pool
-	token     *xplorentities.XPlorTokenWithTimestamp
-	authMutex *sync.Mutex
+	providers        *sync.Pool
+	token            *xplorentities.XPlorTokenWithTimestamp
+	authMutex        *sync.Mutex
+	nodeClubRelation map[string]string
 }
 type xplorExecutor struct {
 	config         *xplorConfig
 	client         *http.Client
 	defaultTimeout time.Duration
 	nodeId         *string
+	clubId         *string
 }
 
 func Init(cfg *xplorConfig) *XplorProvider {
 	syncOnce.Do(func() {
 		xplorProviderInstace = &XplorProvider{
-			authMutex: &sync.Mutex{},
+			authMutex:        &sync.Mutex{},
+			nodeClubRelation: make(map[string]string),
 			providers: &sync.Pool{
 				New: func() any {
 					return &xplorExecutor{config: cfg, client: http.DefaultClient, defaultTimeout: 30 * time.Second}
@@ -52,7 +55,6 @@ func (pp XplorProvider) getExecutor(nodeId string) *xplorExecutor {
 	if strings.TrimSpace(nodeId) == "" {
 		executor.nodeId = nil
 	} else {
-
 		executor.nodeId = &nodeId
 	}
 	return executor
@@ -68,8 +70,10 @@ func (xe *xplorExecutor) generateHeaders(accessToken string) map[string]string {
 		"Content-Type":  "application/json",
 		"Authorization": "Bearer " + accessToken,
 	}
-	if xe.nodeId != nil && strings.TrimSpace(*xe.nodeId) != "" {
+	if xe.nodeId != nil && strings.TrimSpace(*xe.nodeId) != "" && xe.clubId != nil && strings.TrimSpace(*xe.clubId) != "" {
 		headers["X-User-Network-Node-Id"] = "/" + xe.config.EnterpriseName + "/network_nodes/" + *xe.nodeId
+		headers["X-User-Club-Id"] = "/" + xe.config.EnterpriseName + "/clubs/" + *xe.clubId
+
 	}
 	return headers
 }
@@ -101,19 +105,59 @@ func (xe *XplorProvider) authenticateIfNeeded(executor *xplorExecutor) *xplorent
 			ObtainedAt: time.Now(),
 		}
 	}
+
 	return nil
 
 }
-func (xe *XplorProvider) Families(nodeId string, params *xplorentities.XPlorFamiliesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorFamilies, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) generateClubIdIfNeeded(executor *xplorExecutor, nodeId string) *xplorentities.ErrorResponse {
+	if clubId, ok := xe.nodeClubRelation[nodeId]; ok {
+		executor.clubId = &clubId
+		return nil
+	}
+	if xe.token != nil && executor.nodeId != nil && strings.TrimSpace(*executor.nodeId) != "" {
+		if _, ok := xe.nodeClubRelation[*executor.nodeId]; !ok {
+			node, err := executor.networkNode(xe.token.Token.AccessToken, *executor.nodeId)
+			if err != nil {
+				return err
+			}
+			var id, cErr = node.ClubIDValue()
+			if cErr != nil {
+				return &xplorentities.ErrorResponse{
+					Code:    404,
+					Message: "Failed to get club ID for node: " + cErr.Error(),
+				}
+			}
+			xe.nodeClubRelation[*executor.nodeId] = id
+			executor.clubId = &id
+
+		}
+	}
+	return nil
+}
+
+func (xe *XplorProvider) getExecutorFullyInitialized(nodeId string) (*xplorExecutor, *xplorentities.ErrorResponse) {
 	if err := checkNodeId(nodeId); err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
+	executor := xe.getExecutor(nodeId)
 
 	if err := xe.authenticateIfNeeded(executor); err != nil {
+		xe.putExecutor(executor)
 		return nil, err
 	}
+	if err := xe.generateClubIdIfNeeded(executor, nodeId); err != nil {
+		xe.putExecutor(executor)
+		return nil, err
+	}
+	return executor, nil
+}
+func (xe *XplorProvider) Families(nodeId string, params *xplorentities.XPlorFamiliesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorFamilies, *xplorentities.ErrorResponse) {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
+		return nil, err
+	}
+	defer xe.putExecutor(executor)
+
 	families, err := executor.families(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -126,21 +170,18 @@ func (xe *XplorProvider) Families(nodeId string, params *xplorentities.XPlorFami
 
 }
 func (xe *XplorProvider) Family(nodeId string, familyId string) (*xplorentities.XPlorFamily, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(familyId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Family ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	family, err := executor.family(xe.token.Token.AccessToken, familyId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -153,16 +194,11 @@ func (xe *XplorProvider) Family(nodeId string, familyId string) (*xplorentities.
 
 }
 func (xe *XplorProvider) Clubs(nodeId string) (*xplorentities.XPloreClubs, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 
 	clubs, err := executor.clubs(xe.token.Token.AccessToken, nil)
 	if err != nil {
@@ -176,21 +212,18 @@ func (xe *XplorProvider) Clubs(nodeId string) (*xplorentities.XPloreClubs, *xplo
 
 }
 func (xe *XplorProvider) Club(nodeId string, clubId string) (*xplorentities.XPlorClub, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(clubId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Club ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	club, err := executor.club(xe.token.Token.AccessToken, clubId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -203,15 +236,12 @@ func (xe *XplorProvider) Club(nodeId string, clubId string) (*xplorentities.XPlo
 
 }
 func (xe *XplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPagination, timeGap *xplorentities.XPlorTimeGap) (*xplorentities.XPlorEvents, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	events, err := executor.events(xe.token.Token.AccessToken, pagination, timeGap)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -224,15 +254,12 @@ func (xe *XplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPa
 
 }
 func (xe *XplorProvider) Activities(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorActivities, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	activities, err := executor.activities(xe.token.Token.AccessToken, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -244,21 +271,18 @@ func (xe *XplorProvider) Activities(nodeId string, pagination *xplorentities.XPl
 	return activities, nil
 }
 func (xe *XplorProvider) Activity(nodeId string, activityId string) (*xplorentities.XPlorActivity, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(activityId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Activity ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	var executor, err = xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	activity, err := executor.activity(xe.token.Token.AccessToken, activityId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -271,15 +295,12 @@ func (xe *XplorProvider) Activity(nodeId string, activityId string) (*xplorentit
 
 }
 func (xd *XplorProvider) Studios(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorStudios, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xd.getExecutor(nodeId)
 	defer xd.putExecutor(executor)
 
-	if err := xd.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	studios, err := executor.studios(xd.token.Token.AccessToken, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -292,21 +313,18 @@ func (xd *XplorProvider) Studios(nodeId string, pagination *xplorentities.XPlorP
 
 }
 func (xd *XplorProvider) Studio(nodeId string, studioId string) (*xplorentities.XPlorStudio, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(studioId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Studio ID is required",
 		}
 	}
-	var executor = xd.getExecutor(nodeId)
-	defer xd.putExecutor(executor)
-
-	if err := xd.authenticateIfNeeded(executor); err != nil {
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xd.putExecutor(executor)
+
 	studio, err := executor.studio(xd.token.Token.AccessToken, studioId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -319,15 +337,12 @@ func (xd *XplorProvider) Studio(nodeId string, studioId string) (*xplorentities.
 
 }
 func (xd *XplorProvider) Contacts(nodeId string, params *xplorentities.XPlorContactsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContacts, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xd.getExecutor(nodeId)
 	defer xd.putExecutor(executor)
 
-	if err := xd.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	contacts, err := executor.contacts(xd.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -340,21 +355,18 @@ func (xd *XplorProvider) Contacts(nodeId string, params *xplorentities.XPlorCont
 
 }
 func (xd *XplorProvider) Contact(nodeId string, contactId string) (*xplorentities.XPlorContact, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(contactId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Contact ID is required",
 		}
 	}
-	var executor = xd.getExecutor(nodeId)
-	defer xd.putExecutor(executor)
-
-	if err := xd.authenticateIfNeeded(executor); err != nil {
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xd.putExecutor(executor)
+
 	contact, err := executor.contact(xd.token.Token.AccessToken, contactId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -367,15 +379,12 @@ func (xd *XplorProvider) Contact(nodeId string, contactId string) (*xplorentitie
 
 }
 func (xe *XplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlorSubscriptionsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorSubscriptions, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	subscriptions, err := executor.subscriptions(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -388,21 +397,18 @@ func (xe *XplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlo
 
 }
 func (xe *XplorProvider) Subscription(nodeId string, subscriptionId string) (*xplorentities.XPlorSubscription, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(subscriptionId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Subscription ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	subscription, err := executor.subscription(xe.token.Token.AccessToken, subscriptionId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -415,15 +421,12 @@ func (xe *XplorProvider) Subscription(nodeId string, subscriptionId string) (*xp
 
 }
 func (xe *XplorProvider) Classes(nodeId string, params *xplorentities.XPlorClassesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	classes, err := executor.classes(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -436,21 +439,18 @@ func (xe *XplorProvider) Classes(nodeId string, params *xplorentities.XPlorClass
 
 }
 func (xe *XplorProvider) Class(nodeId string, classId string) (*xplorentities.XPlorClass, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(classId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Class ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	class, err := executor.class(xe.token.Token.AccessToken, classId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -504,15 +504,12 @@ func (xe *XplorProvider) NetworkNode(nodeId string) (*xplorentities.XPlorNetwork
 }
 
 func (xe *XplorProvider) Attendees(nodeId string, classId *string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorAttendees, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	attendees, err := executor.attendees(xe.token.Token.AccessToken, classId, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -525,15 +522,12 @@ func (xe *XplorProvider) Attendees(nodeId string, classId *string, pagination *x
 
 }
 func (xe *XplorProvider) Coaches(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPloreCoaches, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	coaches, err := executor.coaches(xe.token.Token.AccessToken, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -546,21 +540,18 @@ func (xe *XplorProvider) Coaches(nodeId string, pagination *xplorentities.XPlorP
 
 }
 func (xe *XplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XPloreCoach, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(coachId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Coach ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	coach, err := executor.coach(xe.token.Token.AccessToken, coachId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -573,15 +564,12 @@ func (xe *XplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XP
 
 }
 func (xe *XplorProvider) Articles(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorArticles, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	articles, err := executor.articles(xe.token.Token.AccessToken, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -594,21 +582,18 @@ func (xe *XplorProvider) Articles(nodeId string, pagination *xplorentities.XPlor
 
 }
 func (xe *XplorProvider) Article(nodeId string, articleId string) (*xplorentities.XPlorArticle, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(articleId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Article ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	article, err := executor.article(xe.token.Token.AccessToken, articleId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -621,15 +606,12 @@ func (xe *XplorProvider) Article(nodeId string, articleId string) (*xplorentitie
 
 }
 func (xe *XplorProvider) Recurrences(nodeId string, params *xplorentities.XPlorRecurrencesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorRecurrences, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	recurrences, err := executor.recurrences(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -642,21 +624,18 @@ func (xe *XplorProvider) Recurrences(nodeId string, params *xplorentities.XPlorR
 
 }
 func (xe *XplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplorentities.XPlorRecurrence, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(recurrenceId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Recurrence ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	recurrence, err := executor.frecurrence(xe.token.Token.AccessToken, recurrenceId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -670,21 +649,18 @@ func (xe *XplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplore
 }
 
 func (xe *XplorProvider) ClassType(nodeId string, classTypeId string) (*xplorentities.XPlorClassType, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(classTypeId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Class Type ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	classType, err := executor.classType(xe.token.Token.AccessToken, classTypeId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -697,15 +673,12 @@ func (xe *XplorProvider) ClassType(nodeId string, classTypeId string) (*xplorent
 }
 
 func (xe *XplorProvider) CounterLines(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	counterLines, err := executor.counterLines(xe.token.Token.AccessToken, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -718,21 +691,18 @@ func (xe *XplorProvider) CounterLines(nodeId string, pagination *xplorentities.X
 
 }
 func (xe *XplorProvider) CounterLine(nodeId string, counterLineId string) (*xplorentities.XPlorCounterLine, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(counterLineId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Counter Line ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	counterLine, err := executor.counterLine(xe.token.Token.AccessToken, counterLineId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -744,15 +714,12 @@ func (xe *XplorProvider) CounterLine(nodeId string, counterLineId string) (*xplo
 
 }
 func (xe *XplorProvider) ContactTags(nodeId string, params *xplorentities.XPlorContactTagsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactTags, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	contactTags, err := executor.contactTags(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -765,21 +732,18 @@ func (xe *XplorProvider) ContactTags(nodeId string, params *xplorentities.XPlorC
 
 }
 func (xe *XplorProvider) ContactTag(nodeId string, contactTagId string) (*xplorentities.XPlorContactTag, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(contactTagId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Contact Tag ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	contactTag, err := executor.contactTag(xe.token.Token.AccessToken, contactTagId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -834,15 +798,12 @@ func (xe *XplorProvider) User(userId string) (*xplorentities.XPlorUser, *xploren
 
 }
 func (xe *XplorProvider) Zones(nodeId string, params *xplorentities.XPlorZonesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorZones, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
-	var executor = xe.getExecutor(nodeId)
 	defer xe.putExecutor(executor)
 
-	if err := xe.authenticateIfNeeded(executor); err != nil {
-		return nil, err
-	}
 	zones, err := executor.zones(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
@@ -855,21 +816,18 @@ func (xe *XplorProvider) Zones(nodeId string, params *xplorentities.XPlorZonesPa
 
 }
 func (xe *XplorProvider) Zone(nodeId string, zoneId string) (*xplorentities.XPlorZone, *xplorentities.ErrorResponse) {
-	if err := checkNodeId(nodeId); err != nil {
-		return nil, err
-	}
 	if strings.TrimSpace(zoneId) == "" {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "Zone ID is required",
 		}
 	}
-	var executor = xe.getExecutor(nodeId)
-	defer xe.putExecutor(executor)
-
-	if err := xe.authenticateIfNeeded(executor); err != nil {
+	executor, err := xe.getExecutorFullyInitialized(nodeId)
+	if err != nil {
 		return nil, err
 	}
+	defer xe.putExecutor(executor)
+
 	zone, err := executor.zone(xe.token.Token.AccessToken, zoneId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{

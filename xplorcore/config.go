@@ -35,7 +35,6 @@ func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientS
 			Value:      value,
 		})
 	}
-	// readEnvFile()
 	return config
 }
 
@@ -64,10 +63,3 @@ func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeader
 	return request
 
 }
-
-// func readEnvFile() {
-// 	err := godotenv.Load()
-// 	if err != nil {
-// 		panic("Error loading .env file, must have ENVIRONMENT variable set")
-// 	}
-// }

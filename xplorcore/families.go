@@ -20,8 +20,7 @@ func (xe xplorExecutor) families(accesToken string, params *xplorentities.XPlorF
 			params.ToValues(&queryParams)
 		}
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/families", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorFamilies](ctxWithTimeout, xe.client, request)
@@ -49,8 +48,7 @@ func (xe xplorExecutor) family(accesToken string, familyId string) (*xplorentiti
 
 	go func() {
 		formData := url.Values{}
-		formData.Set("client_id", xe.config.ClientID)
-		formData.Set("client_secret", xe.config.ClientSecret)
+
 		var request = xe.config.generateRequest(http.MethodGet, "/families/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorFamily](ctxWithTimeout, xe.client, request)

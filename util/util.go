@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -91,7 +92,7 @@ func ExecuteRequest[T any](ctx context.Context, client *http.Client, request *ht
 	defer response.Body.Close()
 
 	bodyBytes, err := io.ReadAll(response.Body)
-	// log.Println(string(bodyBytes))
+	log.Println(string(bodyBytes))
 	if err != nil {
 		return RequestResult[T]{
 			Response: zero,
