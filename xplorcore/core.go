@@ -60,6 +60,7 @@ func (pp XplorProvider) getExecutor(nodeId string) *xplorExecutor {
 	return executor
 }
 func (pp XplorProvider) putExecutor(executor *xplorExecutor) {
+	executor.nodeId = nil
 	pp.providers.Put(executor)
 }
 func (pp XplorProvider) Close() {
@@ -70,10 +71,12 @@ func (xe *xplorExecutor) generateHeaders(accessToken string) map[string]string {
 		"Content-Type":  "application/json",
 		"Authorization": "Bearer " + accessToken,
 	}
-	if xe.nodeId != nil && strings.TrimSpace(*xe.nodeId) != "" && xe.clubId != nil && strings.TrimSpace(*xe.clubId) != "" {
+	if xe.nodeId != nil && strings.TrimSpace(*xe.nodeId) != "" {
 		headers["X-User-Network-Node-Id"] = "/" + xe.config.EnterpriseName + "/network_nodes/" + *xe.nodeId
-		headers["X-User-Club-Id"] = "/" + xe.config.EnterpriseName + "/clubs/" + *xe.clubId
 
+	}
+	if xe.clubId != nil && strings.TrimSpace(*xe.clubId) != "" {
+		headers["X-User-Club-Id"] = "/" + xe.config.EnterpriseName + "/clubs/" + *xe.clubId
 	}
 	return headers
 }

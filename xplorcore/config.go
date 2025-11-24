@@ -60,6 +60,7 @@ func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeader
 		request.Header.Add(headerName, value)
 	}
 	// log.Println("Request URL:", request.URL.String())
+
 	return request
 
 }
