@@ -190,6 +190,60 @@ func (r *XPlorRecurrence) GetFullDay() string {
 	}
 }
 
+// GetWeekdayNumber returns the weekday as an integer (0 = Sunday, 1 = Monday, ... 6 = Saturday)
+func (r *XPlorRecurrence) GetWeekdayNumber() int {
+	day := strings.ToLower(strings.TrimSpace(r.Day))
+	switch day {
+	// Inglés diminutivo
+	case "mo":
+		return 1
+	case "tu":
+		return 2
+	case "we":
+		return 3
+	case "th":
+		return 4
+	case "fr":
+		return 5
+	case "sa":
+		return 6
+	case "su":
+		return 0
+	// Español diminutivo
+	case "lu":
+		return 1
+	case "ma":
+		return 2
+	case "mi":
+		return 3
+	case "ju":
+		return 4
+	case "vi":
+		return 5
+	case "sá":
+		return 6
+	case "do":
+		return 0
+	// Si ya viene completo
+	case "monday", "lunes":
+		return 1
+	case "tuesday", "martes":
+		return 2
+	case "wednesday", "miércoles":
+		return 3
+	case "thursday", "jueves":
+		return 4
+	case "friday", "viernes":
+		return 5
+	case "saturday", "sábado":
+		return 6
+	case "sunday", "domingo":
+		return 0
+	default:
+		return -1
+	}
+}
+
 // Métodos para la colección completa
 func (rc *XPlorRecurrences) CollectionID() (string, error) {
 	return ExtractIDFromString(rc.ID, "collection ID field is empty")
