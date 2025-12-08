@@ -11,14 +11,14 @@ type XPlorNetworkNodes struct {
 
 // Entidad NetworkNode
 type XPlorNetworkNode struct {
-	NotworkNodeID *string            `json:"@id"`
-	Type          string             `json:"@type"`
-	ID            int                `json:"id"`
-	Name          string             `json:"name"`
-	Alias         *string            `json:"alias"`
-	NodeType      string             `json:"type"`
-	ClubID        *string            `json:"clubId"`
-	Children      []XPlorNetworkNode `json:"children"`
+	NotworkNodeID *string `json:"@id"`
+	Type          string  `json:"@type"`
+	ID            int     `json:"id"`
+	Name          string  `json:"name"`
+	Alias         *string `json:"alias"`
+	NodeType      string  `json:"type"`
+	ClubID        *string `json:"clubId"`
+	Children      any     `json:"children"`
 }
 
 // ---------------- Métodos helpers ----------------
