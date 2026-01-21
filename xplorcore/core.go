@@ -256,14 +256,14 @@ func (xe *XplorProvider) Events(nodeId string, pagination *xplorentities.XPlorPa
 	return events, nil
 
 }
-func (xe *XplorProvider) Activities(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorActivities, *xplorentities.ErrorResponse) {
+func (xe *XplorProvider) Activities(nodeId string, queryParams *xplorentities.XPlorActivitiesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorActivities, *xplorentities.ErrorResponse) {
 	executor, err := xe.getExecutorFullyInitialized(nodeId)
 	if err != nil {
 		return nil, err
 	}
 	defer xe.putExecutor(executor)
 
-	activities, err := executor.activities(xe.token.Token.AccessToken, pagination)
+	activities, err := executor.activities(xe.token.Token.AccessToken, queryParams, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
@@ -639,7 +639,7 @@ func (xe *XplorProvider) Recurrence(nodeId string, recurrenceId string) (*xplore
 	}
 	defer xe.putExecutor(executor)
 
-	recurrence, err := executor.frecurrence(xe.token.Token.AccessToken, recurrenceId)
+	recurrence, err := executor.recurrence(xe.token.Token.AccessToken, recurrenceId)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,

@@ -9,16 +9,19 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-func (xe xplorExecutor) classes(accesToken string, params *xplorentities.XPlorClassesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) classes(accesToken string, queryParams *xplorentities.XPlorClassesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorClasses, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
 	resultChan := make(chan util.RequestResult[*xplorentities.XPlorClasses], 1)
 
 	go func() {
-		var queryParams = xplorentities.BuildClassesWithPaginationQueryParams(params, pagination)
+		var paginatedParams = xplorentities.BuildPaginationQueryParams(pagination)
+		if queryParams != nil {
+			queryParams.ToValues(xe.config.EnterpriseName, &paginatedParams)
+		}
 		formData := url.Values{}
 
-		var request = xe.config.generateRequest(http.MethodGet, "/class_events", xe.generateHeaders(accesToken), queryParams, formData)
+		var request = xe.config.generateRequest(http.MethodGet, "/class_events", xe.generateHeaders(accesToken), paginatedParams, formData)
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorClasses](ctxWithTimeout, xe.client, request)
 		resultChan <- result

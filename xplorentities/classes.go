@@ -1,6 +1,7 @@
 package xplorentities
 
 import (
+	"net/url"
 	"time"
 
 	"github.com/angelbarreiros/XPlorGo/util"
@@ -135,4 +136,105 @@ func (c XPlorClass) GetAllContactIDs() ([]string, error) {
 	}
 
 	return contactIDs, nil
+}
+
+// XPlorClassesParams represents the search parameters for classes
+type XPlorClassesParams struct {
+	Club                    *string
+	Clubs                   []string
+	Coach                   *string
+	Coaches                 []string
+	Activity                *string
+	Activities              []string
+	Studio                  *string
+	Studios                 []string
+	Recurrence              *string
+	Recurrences             []string
+	AttendeeContactID       *string
+	AttendeeContactIDs      []string
+	AttendeeState           *string
+	AttendeeStates          []string
+	ActivityGroup           *string
+	ActivityGroups          []string
+	StartedAtBefore         *time.Time
+	StartedAtStrictlyBefore *time.Time
+	StartedAtAfter          *time.Time
+	StartedAtStrictlyAfter  *time.Time
+	OrderStartedAt          *string // asc or desc
+	Available               *string
+}
+
+// ToValues converts the params to url.Values for query parameters
+func (p XPlorClassesParams) ToValues(enterpriseName string, values *url.Values) {
+	// Single value filters
+	if p.Club != nil {
+		values.Set("club", "/"+enterpriseName+"/clubs/"+*p.Club)
+	}
+	if p.Coach != nil {
+		values.Set("coach", *p.Coach)
+	}
+	if p.Activity != nil {
+		values.Set("activity", *p.Activity)
+	}
+	if p.Studio != nil {
+		values.Set("studio", *p.Studio)
+	}
+	if p.Recurrence != nil {
+		values.Set("recurrence", *p.Recurrence)
+	}
+	if p.AttendeeContactID != nil {
+		values.Set("attendees.contactId", *p.AttendeeContactID)
+	}
+	if p.AttendeeState != nil {
+		values.Set("attendees.state", *p.AttendeeState)
+	}
+	if p.ActivityGroup != nil {
+		values.Set("activity.activityGroups", *p.ActivityGroup)
+	}
+	if p.OrderStartedAt != nil {
+		values.Set("order[startedAt]", *p.OrderStartedAt)
+	}
+	if p.Available != nil {
+		values.Set("available", *p.Available)
+	}
+
+	// Array filters
+	for _, club := range p.Clubs {
+		values.Add("club[]", club)
+	}
+	for _, coach := range p.Coaches {
+		values.Add("coach[]", coach)
+	}
+	for _, activity := range p.Activities {
+		values.Add("activity[]", activity)
+	}
+	for _, studio := range p.Studios {
+		values.Add("studio[]", studio)
+	}
+	for _, recurrence := range p.Recurrences {
+		values.Add("recurrence[]", recurrence)
+	}
+	for _, contactID := range p.AttendeeContactIDs {
+		values.Add("attendees.contactId[]", contactID)
+	}
+	for _, state := range p.AttendeeStates {
+		values.Add("attendees.state[]", state)
+	}
+	for _, group := range p.ActivityGroups {
+		values.Add("activity.activityGroups[]", group)
+	}
+
+	// Date filters
+	if p.StartedAtBefore != nil {
+		values.Set("startedAt[before]", p.StartedAtBefore.Format("2006-01-02 15:04:05"))
+	}
+	if p.StartedAtStrictlyBefore != nil {
+		values.Set("startedAt[strictly_before]", p.StartedAtStrictlyBefore.Format("2006-01-02 15:04:05"))
+	}
+	if p.StartedAtAfter != nil {
+		values.Set("startedAt[after]", p.StartedAtAfter.Format("2006-01-02 15:04:05"))
+	}
+	if p.StartedAtStrictlyAfter != nil {
+		values.Set("startedAt[strictly_after]", p.StartedAtStrictlyAfter.Format("2006-01-02 15:04:05"))
+	}
 }

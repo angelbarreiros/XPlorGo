@@ -1,6 +1,7 @@
 package xplorentities
 
 import (
+	"net/url"
 	"path"
 	"strconv"
 
@@ -28,7 +29,7 @@ type XPlorActivity struct {
 	CreatedBy          string             `json:"createdBy"`
 	TemplateToken      *string            `json:"templateToken"`
 	ShowcaseActivities []ShowcaseActivity `json:"showcaseActivities"`
-	ActivityGroups     []string           `json:"activityGroups"`
+	ActivityGroups     []ActivityGroup    `json:"activityGroups"`
 	ArchivedAt         *util.LocalTime    `json:"archivedAt"`
 	ArchivedBy         *string            `json:"archivedBy"`
 	IsBookable         bool               `json:"isBookable"`
@@ -49,6 +50,17 @@ type ShowcaseActivity struct {
 type ShowcaseProps struct {
 	ExtendedImage       *string `json:"extendedImage"`
 	ShowAvailablePlaces bool    `json:"showAvailablePlaces"`
+}
+
+// ----------- ActivityGroup -----------
+type ActivityGroup struct {
+	ID              string   `json:"@id"`
+	Type            string   `json:"@type"`
+	Name            string   `json:"name"`
+	Description     *string  `json:"description"`
+	Type_           *string  `json:"type"`
+	Activities      []string `json:"activities"`
+	NetworkNodeName string   `json:"networkNodeName"`
 }
 
 // ----------- Métodos útiles -----------
@@ -75,6 +87,11 @@ func (a XPlorActivity) ShowcaseIDs() ([]int, error) {
 	return ids, nil
 }
 
+// Chequear si la actividad es activa (no archivada)
+func (a XPlorActivity) IsActive() bool {
+	return a.ArchivedAt == nil
+}
+
 // Chequear si la actividad es de PADEL
 func (a XPlorActivity) IsPadel() bool {
 	return len(a.Name) >= 5 && a.Name[:5] == "PADEL"
@@ -94,4 +111,31 @@ func (a XPlorActivity) DurationMinutes() int {
 		}
 	}
 	return 0
+}
+
+// XPlorActivitiesParams represents the search parameters for activities
+type XPlorActivitiesParams struct {
+	ClubID   *string
+	ClubIDs  []string
+	Name     *string
+	Archived *bool
+}
+
+// ToValues converts the params to url.Values for query parameters
+func (p XPlorActivitiesParams) ToValues(orgName string, values *url.Values) {
+	// Single value filters
+	if p.ClubID != nil {
+		values.Set("clubId", "/"+orgName+"/clubs/"+*p.ClubID)
+	}
+	if p.Name != nil {
+		values.Set("name", *p.Name)
+	}
+	if p.Archived != nil && *p.Archived {
+		values.Set("archived", "true")
+	}
+
+	// Array filters
+	for _, clubID := range p.ClubIDs {
+		values.Add("clubId[]", clubID)
+	}
 }

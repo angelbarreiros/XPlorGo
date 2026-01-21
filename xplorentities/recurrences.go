@@ -347,6 +347,7 @@ type XPlorRecurrencesParams struct {
 	EndedAtAfter            *time.Time
 	EndedAtStrictlyAfter    *time.Time
 	Week                    string
+	Club                    string
 }
 
 // ToValues converts the params to url.Values for query parameters
@@ -377,6 +378,10 @@ func (p XPlorRecurrencesParams) ToValues(values *url.Values) {
 	}
 	if p.EndedAtStrictlyAfter != nil {
 		values.Set("endedAt[strictly_after]", p.EndedAtStrictlyAfter.Format("2006-01-02T15:04:05"))
+	}
+	// Club filter
+	if p.Club != "" {
+		values.Set("club", p.Club)
 	}
 
 	// Week filter
