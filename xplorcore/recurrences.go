@@ -2,7 +2,6 @@ package xplorcore
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"net/url"
 
@@ -23,8 +22,6 @@ func (xe xplorExecutor) recurrences(accesToken string, params *xplorentities.XPl
 		formData := url.Values{}
 
 		var request = xe.config.generateRequest(http.MethodGet, "/recurrences", xe.generateHeaders(accesToken), queryParams, formData)
-		log.Println("Request URL:", request.URL.String())
-		log.Println("Query Params:", request.URL.Query())
 		request = request.WithContext(ctxWithTimeout)
 		result := util.ExecuteRequest[*xplorentities.XPlorRecurrences](ctxWithTimeout, xe.client, request)
 		resultChan <- result
