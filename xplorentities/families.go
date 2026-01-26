@@ -101,10 +101,10 @@ func (s sharedResource) FamilySubscriptionID() (string, error) {
 	return ExtractID(s.Subscription, "subscription field is empty")
 }
 
-type resourceLimits struct {
-	AdultsMax   int `json:"adultsMax"`
-	ChildrenMax int `json:"childrenMax"`
-}
+// type resourceLimits struct {
+// 	AdultsMax   int `json:"adultsMax"`
+// 	ChildrenMax int `json:"childrenMax"`
+// }
 
 // metodos
 func (f XPlorFamily) Parents() []familyMember {

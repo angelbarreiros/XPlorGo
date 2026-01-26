@@ -77,7 +77,7 @@ type RequestResult[T any] struct {
 // It takes a context, http client, request, and returns a typed RequestResult
 func ExecuteRequest[T any](ctx context.Context, client *http.Client, request *http.Request) RequestResult[T] {
 	var zero T
-
+	// log.Println(request.URL)
 	response, clientErr := client.Do(request)
 	if clientErr != nil {
 		return RequestResult[T]{

@@ -165,10 +165,10 @@ type XPlorClassesParams struct {
 }
 
 // ToValues converts the params to url.Values for query parameters
-func (p XPlorClassesParams) ToValues(enterpriseName string, values *url.Values) {
+func (p XPlorClassesParams) ToValues(orgName string, values *url.Values) {
 	// Single value filters
 	if p.Club != nil {
-		values.Set("club", "/"+enterpriseName+"/clubs/"+*p.Club)
+		values.Set("club", "/"+orgName+"/clubs/"+*p.Club)
 	}
 	if p.Coach != nil {
 		values.Set("coach", *p.Coach)
@@ -180,7 +180,7 @@ func (p XPlorClassesParams) ToValues(enterpriseName string, values *url.Values) 
 		values.Set("studio", *p.Studio)
 	}
 	if p.Recurrence != nil {
-		values.Set("recurrence", *p.Recurrence)
+		values.Set("clubId", "/"+orgName+"/recurrences/"+*p.Recurrence)
 	}
 	if p.AttendeeContactID != nil {
 		values.Set("attendees.contactId", *p.AttendeeContactID)
@@ -212,7 +212,7 @@ func (p XPlorClassesParams) ToValues(enterpriseName string, values *url.Values) 
 		values.Add("studio[]", studio)
 	}
 	for _, recurrence := range p.Recurrences {
-		values.Add("recurrence[]", recurrence)
+		values.Add("recurrence[]", "/"+orgName+"/recurrences/"+recurrence)
 	}
 	for _, contactID := range p.AttendeeContactIDs {
 		values.Add("attendees.contactId[]", contactID)
