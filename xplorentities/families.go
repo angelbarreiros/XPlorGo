@@ -10,11 +10,11 @@ import (
 )
 
 type XPlorFamilies struct {
-	Context   string        `json:"@context"`
-	ID        string        `json:"@id"`
-	Type      string        `json:"@type"`
-	Families  []XPlorFamily `json:"hydra:member"`
-	HydraView *HydraView    `json:"hydra:view,omitempty"`
+	Context    string        `json:"@context"`
+	ID         string        `json:"@id"`
+	Type       string        `json:"@type"`
+	Families   []XPlorFamily `json:"hydra:member"`
+	Pagination *HydraView    `json:"hydra:view,omitempty"`
 }
 
 type HydraIriTemplateMapping struct {
@@ -59,7 +59,7 @@ type familyLinkResource struct {
 	SharedResource sharedResource `json:"sharedResource"`
 	Type           string         `json:"type"`
 	Owner          bool           `json:"owner"`
-	CreatedAt      time.Time      `json:"createdAt"`
+	CreatedAt      util.LocalDate `json:"createdAt"`
 }
 
 type sharedResource struct {
