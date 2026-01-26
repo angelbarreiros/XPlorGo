@@ -25,6 +25,7 @@ type HydraIriTemplateMapping struct {
 }
 
 type XPlorFamily struct {
+	Context         string           `json:"@context"`
 	ID              *string          `json:"@id"`
 	Type            string           `json:"@type"`
 	Name            string           `json:"name"`
@@ -35,6 +36,7 @@ type XPlorFamily struct {
 }
 
 type familyMember struct {
+	Context             string               `json:"@context"`
 	ID                  *string              `json:"@id"`
 	Type                string               `json:"@type"`
 	Contact             contact              `json:"contact"`
@@ -47,6 +49,7 @@ type familyMember struct {
 	OverriddenBy        any                  `json:"overriddenBy"`
 }
 type contact struct {
+	Context    string          `json:"@context"`
 	ID         *string         `json:"@id"`
 	Type       string          `json:"@type"`
 	BirthDate  *util.LocalDate `json:"birthDate"`
@@ -56,17 +59,23 @@ type contact struct {
 }
 
 type familyLinkResource struct {
+	Context        string         `json:"@context"`
+	ID             *string        `json:"@id"`
+	Type           string         `json:"@type"`
 	SharedResource sharedResource `json:"sharedResource"`
-	Type           string         `json:"type"`
+	RelationType   string         `json:"type"`
 	Owner          bool           `json:"owner"`
 	CreatedAt      util.LocalDate `json:"createdAt"`
 }
 
 type sharedResource struct {
-	Subscription       *string        `json:"subsregistrar"`
-	SubscriptionOption *string        `json:"subscriptionOption"`
-	Family             string         `json:"family"`
-	Properties         resourceLimits `json:"properties"`
+	Context            string  `json:"@context"`
+	ID                 *string `json:"@id"`
+	Type               string  `json:"@type"`
+	Subscription       *string `json:"subscription"`
+	SubscriptionOption *string `json:"subscriptionOption"`
+	Family             string  `json:"family"`
+	Properties         any     `json:"properties"`
 }
 
 type XPlorFamiliesParams struct {
