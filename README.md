@@ -10,9 +10,9 @@
 
 ```go
 provider := xplorcore.Init(xplorcore.NewConfig(
-    host string,              // "gateway.prod.gravitee.stadline.tech"
-    version string,           // "resa2-mfr"
-    enterpriseName string,    // "maisqueauga"
+    host string,              // "host
+    version string,           // "endpoint"
+    enterpriseName string,    // "org_name"
     clientId string,          // OAuth2 Client ID
     clientSecret string,      // OAuth2 Client Secret
     headers map[string]string // Headers adicionales (ej: API keys)
