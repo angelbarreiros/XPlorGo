@@ -83,6 +83,7 @@ type XPlorFamiliesParams struct {
 	ContactIds []string
 }
 
+// ToValues converts the params to url.Values for query parameters
 func (p XPlorFamiliesParams) ToValues(values *url.Values) {
 	contactId := strings.TrimSpace(p.ContactId)
 	if contactId != "" {
@@ -96,17 +97,12 @@ func (p XPlorFamiliesParams) ToValues(values *url.Values) {
 	}
 }
 
-// Returns the subscription ID from the Subscription field (assumes it's a path)
+// FamilySubscriptionID extracts the subscription ID from the subscription field
 func (s sharedResource) FamilySubscriptionID() (string, error) {
 	return ExtractID(s.Subscription, "subscription field is empty")
 }
 
-// type resourceLimits struct {
-// 	AdultsMax   int `json:"adultsMax"`
-// 	ChildrenMax int `json:"childrenMax"`
-// }
-
-// metodos
+// Parents returns all primary responsible members of the family
 func (f XPlorFamily) Parents() []familyMember {
 	var parents []familyMember
 	for _, m := range f.Members {
@@ -117,7 +113,43 @@ func (f XPlorFamily) Parents() []familyMember {
 	return parents
 }
 
-// 🔹 Devuelve todos los hijos (no responsables)
+// ObtainParentsSecundary returns secondary parents based on age (>= 18) or owner status
+// Includes non-responsible members who are either adults or have owner=true in their FamilyLinkResources
+func (f XPlorFamily) ObtainParentsSecundary() []familyMember {
+	var secondaryParents []familyMember
+
+	for _, m := range f.Members {
+		// No incluir responsables primarios
+		if m.Responsible {
+			continue
+		}
+
+		isAdult := false
+		hasOwnerLink := false
+
+		// Verificar si es adulto por edad
+		if age := m.Age(); age != nil && *age >= 18 {
+			isAdult = true
+		}
+
+		// Verificar si tiene familyLinkResource con owner=true
+		for _, link := range m.FamilyLinkResources {
+			if link.Owner {
+				hasOwnerLink = true
+				break
+			}
+		}
+
+		// Incluir si es adulto O tiene owner link
+		if isAdult || hasOwnerLink {
+			secondaryParents = append(secondaryParents, m)
+		}
+	}
+
+	return secondaryParents
+}
+
+// Children returns all non-responsible members of the family (minors)
 func (f XPlorFamily) Children() []familyMember {
 	var children []familyMember
 	for _, m := range f.Members {
@@ -128,7 +160,7 @@ func (f XPlorFamily) Children() []familyMember {
 	return children
 }
 
-// 🔹 Devuelve todos los nombres de los miembros (útil para debug o listados)
+// MemberNames returns all member full names (useful for debugging or listing)
 func (f XPlorFamily) MemberNames() []string {
 	names := []string{}
 	for _, m := range f.Members {
@@ -137,7 +169,7 @@ func (f XPlorFamily) MemberNames() []string {
 	return names
 }
 
-// 🔹 Agrupa los miembros por estado (client, prospect, lost_client...)
+// MembersByState groups the family members by their contact state
 func (f XPlorFamily) MembersByState() map[string][]familyMember {
 	grouped := make(map[string][]familyMember)
 	for _, m := range f.Members {
@@ -147,7 +179,7 @@ func (f XPlorFamily) MembersByState() map[string][]familyMember {
 	return grouped
 }
 
-// 🔹 Busca un miembro por nombre o apellido
+// FindMember searches for a family member by name (given or family name)
 func (f XPlorFamily) FindMember(name string) *familyMember {
 	nameLower := strings.ToLower(name)
 	for _, m := range f.Members {
@@ -159,7 +191,7 @@ func (f XPlorFamily) FindMember(name string) *familyMember {
 	return nil
 }
 
-// 🔹 Edad aproximada de un miembro (si tiene birthDate)
+// Age calculates the approximate age of a family member (if birth date is available)
 func (m familyMember) Age() *int {
 	if m.Contact.BirthDate == nil || m.Contact.BirthDate.IsZero() {
 		return nil
@@ -168,19 +200,22 @@ func (m familyMember) Age() *int {
 	return &years
 }
 
+// FamilyID extracts the family ID from the @id field
 func (c XPlorFamily) FamilyID() (string, error) {
 	return ExtractID(c.ID, "family ID field is nil")
 }
 
+// FamilyMemberID extracts the family member ID from the @id field
 func (m familyMember) FamilyMemberID() (string, error) {
 	return ExtractID(m.ID, "family member ID field is nil")
 }
 
+// ContactID extracts the contact ID from the @id field
 func (c contact) ContactID() (string, error) {
 	return ExtractID(c.ID, "contact ID field is nil")
 }
 
-// 🔹 Pretty print de familia
+// String returns a formatted string representation of the family
 func (f XPlorFamily) String() string {
 	return fmt.Sprintf("Familia %s (%d miembros, %d padres, %d hijos)",
 		f.Name,

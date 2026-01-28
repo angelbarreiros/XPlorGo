@@ -58,6 +58,8 @@ type ClassEventType struct {
 }
 
 // Función genérica para extraer IDs de strings (no punteros)
+
+// ExtractIDFromString extracts the base ID from a non-pointer string field
 func ExtractIDFromString(field string, errMsg string) (string, error) {
 	if field == "" {
 		return "", errors.New(errMsg)
@@ -68,10 +70,13 @@ func ExtractIDFromString(field string, errMsg string) (string, error) {
 }
 
 // Métodos para Recurrence
+
+// RecurrenceID extracts the recurrence ID from the @id field
 func (r *XPlorRecurrence) RecurrenceID() (string, error) {
 	return ExtractID(r.ID, "recurrence ID field is nil")
 }
 
+// ClassEventIDs extracts all class event IDs from the classEvents field
 func (r *XPlorRecurrence) ClassEventIDs() ([]string, error) {
 	if len(r.ClassEvents) == 0 {
 		return nil, errors.New("no class events available")
@@ -89,17 +94,23 @@ func (r *XPlorRecurrence) ClassEventIDs() ([]string, error) {
 }
 
 // Métodos para ClassEventType
+
+// ClassEventTypeID extracts the class event type ID from the @id field
 func (cet *ClassEventType) ClassEventTypeID() (string, error) {
 	return ExtractID(cet.ID, "class event type ID field is nil")
 }
 
+// ClubID extracts the club ID from the club field
 func (cet *ClassEventType) ClubID() (string, error) {
 	return ExtractID(cet.Club, "club ID field is nil")
 }
 
+// StudioID extracts the studio ID from the studio field
 func (cet *ClassEventType) StudioID() (string, error) {
 	return ExtractID(cet.Studio, "studio ID field is nil")
 }
+
+// CoachId extracts the coach ID from the coach field
 func (cet *ClassEventType) CoachId() (string, error) {
 	return ExtractID(cet.Coach, "coach ID field is nil")
 }
@@ -108,15 +119,19 @@ func (cet *ClassEventType) ActivityID() (string, error) {
 	return ExtractID(cet.Activity, "activity ID field is nil")
 }
 
+// StartTime returns the class start time formatted as HH:MM
 func (cet *ClassEventType) StartTime() string {
 	return cet.StartedAt.Time.Format("15:04")
 }
 
+// EndTime returns the class end time formatted as HH:MM
 func (cet *ClassEventType) EndTime() string {
 	return cet.EndedAt.Time.Format("15:04")
 }
 
 // Método para obtener el tipo de frecuencia
+
+// GetFrequencyType normalizes and returns the frequency type of the recurrence
 func (r *XPlorRecurrence) GetFrequencyType() string {
 	freq := strings.ToLower(strings.TrimSpace(r.Frequency))
 	switch freq {
@@ -139,6 +154,8 @@ func (r *XPlorRecurrence) GetFrequencyType() string {
 }
 
 // Método para obtener el día completo de la semana
+
+// GetFullDay returns the full English weekday name from the abbreviation
 func (r *XPlorRecurrence) GetFullDay() string {
 	day := strings.ToLower(strings.TrimSpace(r.Day))
 	switch day {
@@ -245,6 +262,8 @@ func (r *XPlorRecurrence) GetWeekdayNumber() int {
 }
 
 // Métodos para la colección completa
+
+// CollectionID extracts the collection ID from the @id field
 func (rc *XPlorRecurrences) CollectionID() (string, error) {
 	return ExtractIDFromString(rc.ID, "collection ID field is empty")
 }
@@ -253,10 +272,14 @@ func (rc *XPlorRecurrences) ContextID() (string, error) {
 	return ExtractIDFromString(rc.Context, "context ID field is empty")
 }
 func (rc *XPlorRecurrence) IsActive() bool {
-	return rc.DeletedAt == nil && rc.EndedAt.Time.After(time.Now())
+	if rc.DeletedAt != nil {
+		return false
+	}
+	// Check if EndedAt is valid (not zero time) and after now
+	return !rc.EndedAt.Time.IsZero() && rc.EndedAt.Time.After(time.Now())
 }
 
-// Método para obtener todos los IDs de recurrencia en la colección
+// Obtain all unique club IDs from the recurrences in the collection
 func (rc *XPlorRecurrences) AllRecurrenceIDs() ([]string, error) {
 	if len(rc.Recurrences) == 0 {
 		return nil, errors.New("no recurrences available")
@@ -273,7 +296,7 @@ func (rc *XPlorRecurrences) AllRecurrenceIDs() ([]string, error) {
 	return ids, nil
 }
 
-// Método para obtener todos los IDs de actividades en la colección
+// Obteins all unique club IDs from the recurrences in the collection
 func (rc *XPlorRecurrences) AllActivityIDs() ([]string, error) {
 	if len(rc.Recurrences) == 0 {
 		return nil, errors.New("no recurrences available")
@@ -294,7 +317,7 @@ func (rc *XPlorRecurrences) AllActivityIDs() ([]string, error) {
 	return activityIDs, nil
 }
 
-// Método para obtener todos los IDs de estudios en la colección
+// Obtain all unique club IDs from the recurrences collection
 func (rc *XPlorRecurrences) AllStudioIDs() ([]string, error) {
 	if len(rc.Recurrences) == 0 {
 		return nil, errors.New("no recurrences available")
@@ -315,7 +338,7 @@ func (rc *XPlorRecurrences) AllStudioIDs() ([]string, error) {
 	return studioIDs, nil
 }
 
-// Método para obtener todos los IDs de clubs en la colección
+// Obtains all unique club IDs from the recurrences collection
 func (rc *XPlorRecurrences) AllClubIDs() ([]string, error) {
 	if len(rc.Recurrences) == 0 {
 		return nil, errors.New("no recurrences available")

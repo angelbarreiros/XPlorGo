@@ -275,6 +275,8 @@ type XPlorSubscriptionsParams struct {
 }
 
 // ToValues devuelve los parámetros como url.Values
+
+// ToValues converts the subscription parameters to url.Values for query parameters
 func (p XPlorSubscriptionsParams) ToValues(values *url.Values) {
 	contactId := p.ContactId
 	if strings.TrimSpace(contactId) != "" {
@@ -294,22 +296,27 @@ func (p XPlorSubscriptionsParams) ToValues(values *url.Values) {
 
 // Métodos para obtener IDs
 
+// SubscriptionID extracts the subscription ID from the @id field
 func (s XPlorSubscription) SubscriptionID() (string, error) {
 	return ExtractID(s.Id, "subscription ID field is nil")
 }
 
+// ArticleID extracts the article ID from the articleId field
 func (s XPlorSubscription) ArticleID() (string, error) {
 	return ExtractID(&s.ArticleId, "article ID field is empty")
 }
 
+// ClubID extracts the club ID from the clubId field
 func (s XPlorSubscription) ClubID() (string, error) {
 	return ExtractID(&s.ClubId, "club ID field is empty")
 }
 
+// ContactID extracts the contact ID from the @id field
 func (c Contact) ContactID() (string, error) {
 	return ExtractID(c.Id, "contact ID field is nil")
 }
 
+// ContactClubID extracts the contact club ID from the clubId field
 func (c Contact) ContactClubID() (string, error) {
 	return ExtractID(c.ClubId, "contact club ID field is nil")
 }

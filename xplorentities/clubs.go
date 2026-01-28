@@ -129,7 +129,7 @@ type BlockConfig struct {
 	UseOriginalProductCode bool      `json:"useOriginalProductCode"`
 }
 
-// Devuelve el ID numérico del club extraído de @id (ej: "/enjoy/clubs/1249" → 1249)
+// ClubID extracts the club ID from the @id field path
 func (c XPlorClub) ClubID() (string, error) {
 	// Since ID is now string, extract the numeric part
 	parts := strings.Split(c.ID, "/")
@@ -139,12 +139,12 @@ func (c XPlorClub) ClubID() (string, error) {
 	return "", fmt.Errorf("invalid club ID format")
 }
 
-// Devuelve un identificador legible combinando código y nombre
+// Identifier returns a readable identifier combining code and name
 func (c XPlorClub) Identifier() string {
 	return "[" + c.Code + "] " + c.Name
 }
 
-// Devuelve la dirección postal completa
+// FullAddress returns the complete postal address
 func (c XPlorClub) FullAddress() string {
 	street := ""
 	if c.StreetAddress != nil {
@@ -153,7 +153,7 @@ func (c XPlorClub) FullAddress() string {
 	return strings.TrimSpace(street + ", " + c.PostalCode + " " + c.AddressLocality + " (" + c.AddressCountryIso + ")")
 }
 
-// Indica si el club está activo (no tiene fecha de borrado)
+// IsActive checks if the club is active (not deleted)
 func (c XPlorClub) IsActive() bool {
 	return c.DeletedAt == nil
 }

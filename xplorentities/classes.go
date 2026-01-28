@@ -62,60 +62,76 @@ type XPlorClass struct {
 
 // Métodos para obtener IDs
 
+// ClassEventID extracts the class event ID from the @id field
 func (c XPlorClass) ClassEventID() (string, error) {
 	return ExtractID(c.ID, "class event ID field is nil")
 }
 
+// ClubID extracts the club ID from the club field
 func (c XPlorClass) ClubID() (string, error) {
 	return ExtractID(c.Club, "club ID field is nil")
 }
 
+// StudioID extracts the studio ID from the studio field
 func (c XPlorClass) StudioID() (string, error) {
 	return ExtractID(c.Studio, "studio ID field is nil")
 }
 
+// ActivityID extracts the activity ID from the activity field
 func (c XPlorClass) ActivityID() (string, error) {
 	return ExtractID(c.Activity, "activity ID field is nil")
 }
 
+// CoachID extracts the coach ID from the coach field
 func (c XPlorClass) CoachID() (string, error) {
 	return ExtractID(c.Coach, "coach ID field is nil")
 }
 
+// RecurrenceID extracts the recurrence ID from the recurrence field
 func (c XPlorClass) RecurrenceID() (string, error) {
 	return ExtractID(c.Recurrence, "recurrence ID field is nil")
 }
 
 // Métodos de utilidad para fechas
+
+// GetStartedAt returns the start time as time.Time
 func (c XPlorClass) GetStartedAt() time.Time {
 	return c.StartedAt.Time
 }
 
+// GetEndedAt returns the end time as time.Time
 func (c XPlorClass) GetEndedAt() time.Time {
 	return c.EndedAt.Time
 }
 
+// GetCreatedAt returns the creation time as time.Time
 func (c XPlorClass) GetCreatedAt() time.Time {
 	return c.CreatedAt.Time
 }
 
+// GetUpdatedAt returns the last update time as time.Time
 func (c XPlorClass) GetUpdatedAt() time.Time {
 	return c.UpdatedAt.Time
 }
 
 // Métodos para verificar disponibilidad
+
+// HasAvailableSpots checks if the class has available attendee spots
 func (c XPlorClass) HasAvailableSpots() bool {
 	return c.AttendeeRemaining > 0
 }
 
+// HasQueueSpots checks if the class has available queue spots
 func (c XPlorClass) HasQueueSpots() bool {
 	return c.QueueRemaining > 0
 }
 
+// IsActive checks if the class is active (not deleted or archived)
 func (c XPlorClass) IsActive() bool {
 	return c.DeletedAt == nil && c.ArchivedAt == nil
 }
 
+// IsDeleted checks if the class has been deleted
 func (c XPlorClass) IsDeleted() bool {
 	return c.DeletedAt != nil
 }
@@ -162,6 +178,8 @@ type XPlorClassesParams struct {
 	StartedAtStrictlyAfter  *time.Time
 	OrderStartedAt          *string // asc or desc
 	Available               *string
+	Time                    *string
+	Archived                *string
 }
 
 // ToValues converts the params to url.Values for query parameters
@@ -196,6 +214,12 @@ func (p XPlorClassesParams) ToValues(orgName string, values *url.Values) {
 	}
 	if p.Available != nil {
 		values.Set("available", *p.Available)
+	}
+	if p.Time != nil {
+		values.Set("time", *p.Time)
+	}
+	if p.Archived != nil {
+		values.Set("archived", *p.Archived)
 	}
 
 	// Array filters

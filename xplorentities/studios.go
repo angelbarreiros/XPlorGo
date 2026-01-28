@@ -37,18 +37,22 @@ type XPlorStudio struct {
 
 // ---------- Métodos para extraer IDs ----------
 
-// StudioID devuelve el número final del @id, ej: "/enjoy/studios/2552" → 2552
+// StudioID extracts the studio ID from the @id field
 func (s XPlorStudio) StudioID() (string, error) {
 	return ExtractID(s.ID, "studio ID field is nil")
 }
+
+// ZoneID extracts the zone ID from the zoneId field
 func (s XPlorStudio) ZoneID() (string, error) {
 	return ExtractID(s.ZoneId, "studio ZoneID field is nil")
 }
 
-// ClubID devuelve el número final del club, ej: "/enjoy/clubs/1249" → "1249"
+// ClubID extracts the club ID from the club field
 func (s XPlorStudio) ClubID() (string, error) {
 	return ExtractID(s.Club, "club ID field is nil")
 }
+
+// Address returns the complete concatenated address string
 func (s XPlorStudio) Address() string {
 	parts := []string{}
 

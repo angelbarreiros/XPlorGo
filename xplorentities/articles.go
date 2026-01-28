@@ -113,48 +113,57 @@ type Recurrence struct {
 	PriceCurrency string  `json:"priceCurrency"`
 }
 
-// Métodos para extraer IDs
+// ArticleID extracts the article ID from the @id field
 func (a *XPlorArticle) ArticleID() (string, error) {
 	return ExtractID(a.ID, "article ID field is nil")
 }
 
+// SaleID extracts the sale ID from the sale field
 func (a *XPlorArticle) SaleID() (string, error) {
 	return ExtractID(a.Sale, "sale ID field is nil")
 }
 
+// ProductIDValue extracts the product ID from the productId field
 func (a *XPlorArticle) ProductIDValue() (string, error) {
 	return ExtractID(a.ProductID, "product ID field is nil")
 }
 
+// OfferIDValue extracts the offer ID from the offerId field
 func (a *XPlorArticle) OfferIDValue() (string, error) {
 	return ExtractID(a.OfferID, "offer ID field is nil")
 }
 
+// ClubIDValue extracts the club ID from the clubId field
 func (a *XPlorArticle) ClubIDValue() (string, error) {
 	return ExtractID(a.ClubID, "club ID field is nil")
 }
 
+// ContractModelIDValue extracts the contract model ID from the contractModelId field
 func (a *XPlorArticle) ContractModelIDValue() (string, error) {
 	return ExtractID(a.ContractModelID, "contract model ID field is nil")
 }
 
+// ContractIDValue extracts the contract ID from the contractId field
 func (a *XPlorArticle) ContractIDValue() (string, error) {
 	return ExtractID(a.ContractID, "contract ID field is nil")
 }
 
+// ContactIDValue extracts the contact ID from the contactId field
 func (a *XPlorArticle) ContactIDValue() (string, error) {
 	return ExtractID(a.ContactID, "contact ID field is nil")
 }
 
+// ArticleBehaviorID extracts the article behavior ID from the @id field
 func (ab *ArticleBehavior) ArticleBehaviorID() (string, error) {
 	return ExtractID(ab.ID, "article behavior ID field is nil")
 }
 
+// BehaviorIDValue extracts the behavior ID from the behaviorId field
 func (ab *ArticleBehavior) BehaviorIDValue() (string, error) {
 	return ExtractID(ab.BehaviorID, "behavior ID field is nil")
 }
 
-// Método para obtener el ID base de cualquier campo de tipo *string
+// ExtractID extracts the base ID from any *string field, removing query parameters and taking the last path component
 func ExtractID(field *string, errMsg string) (string, error) {
 	if field == nil {
 		return "", errors.New(errMsg)
@@ -166,7 +175,7 @@ func ExtractID(field *string, errMsg string) (string, error) {
 	return base, nil
 }
 
-// Método para obtener el ID numérico de cualquier campo de tipo *string
+// ExtractIDInt extracts the numeric ID from any *string field and converts it to an integer
 func ExtractIDInt(field *string, errMsg string) (int, error) {
 	if field == nil {
 		return 0, errors.New(errMsg)

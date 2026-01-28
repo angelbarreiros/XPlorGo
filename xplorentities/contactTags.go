@@ -35,19 +35,25 @@ type XPlorContactTags struct {
 }
 
 // Métodos para XPlorContactTag
+
+// ContactTagID extracts the contact tag ID from the @id field
 func (ct *XPlorContactTag) ContactTagID() (string, error) {
 	return ExtractID(ct.ID, "contact tag ID field is nil")
 }
 
+// ContactID extracts the contact ID from the contact field
 func (ct *XPlorContactTag) ContactID() (string, error) {
 	return ExtractID(ct.Contact, "contact ID field is nil")
 }
 
+// SubscriptionID extracts the subscription ID from the subscription field
 func (ct *XPlorContactTag) SubscriptionID() (string, error) {
 	return ExtractID(ct.Subscription, "subscription ID field is nil")
 }
 
 // Métodos para verificar estados
+
+// IsActive checks if the contact tag is currently valid and active
 func (ct *XPlorContactTag) IsActive() bool {
 	now := util.LocalTime{Time: time.Now()}
 
@@ -60,6 +66,7 @@ func (ct *XPlorContactTag) IsActive() bool {
 	return ct.ValidFrom.Time.Before(now.Time) && ct.ValidThrough.Time.After(now.Time)
 }
 
+// IsExpired checks if the contact tag has expired
 func (ct *XPlorContactTag) IsExpired() bool {
 	if ct.ValidThrough == nil {
 		return false // Los tags sin fecha de expiración nunca expiran
@@ -69,29 +76,37 @@ func (ct *XPlorContactTag) IsExpired() bool {
 	return ct.ValidThrough.Time.Before(now.Time)
 }
 
+// IsNotStarted checks if the contact tag validity period has not started yet
 func (ct *XPlorContactTag) IsNotStarted() bool {
 	now := util.LocalTime{Time: time.Now()}
 	return ct.ValidFrom.Time.After(now.Time)
 }
 
+// IsPermanent checks if the contact tag has no expiration date
 func (ct *XPlorContactTag) IsPermanent() bool {
 	return ct.ValidThrough == nil
 }
 
+// IsDeleted checks if the contact tag has been deleted
 func (ct *XPlorContactTag) IsDeleted() bool {
 	return ct.DeletedAt != nil
 }
 
-// Métodos para XPlorContactTags (colección)
+// Métodos para XPlorContactTags (coleción)
+
+// CollectionID extracts the collection ID from the @id field
 func (c *XPlorContactTags) CollectionID() (string, error) {
 	return ExtractIDFromString(c.ID, "collection ID field is invalid")
 }
 
+// ContextID extracts the context ID from the @context field
 func (c *XPlorContactTags) ContextID() (string, error) {
 	return ExtractIDFromString(c.Context, " context ID field is invalid")
 }
 
 // Método para obtener todos los IDs de la colección
+
+// AllContactTagIDs returns all contact tag IDs from the collection
 func (c *XPlorContactTags) AllContactTagIDs() ([]string, error) {
 	if len(c.ContactTags) == 0 {
 		return nil, errors.New("no contact tags available")
@@ -161,6 +176,8 @@ func (c *XPlorContactTags) AllSubscriptionIDs() ([]string, error) {
 }
 
 // Métodos para filtrar tags
+
+// ActiveTags returns all active tags that have not been deleted
 func (c *XPlorContactTags) ActiveTags() []XPlorContactTag {
 	activeTags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -171,6 +188,7 @@ func (c *XPlorContactTags) ActiveTags() []XPlorContactTag {
 	return activeTags
 }
 
+// ExpiredTags returns all expired tags that have not been deleted
 func (c *XPlorContactTags) ExpiredTags() []XPlorContactTag {
 	expiredTags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -181,6 +199,7 @@ func (c *XPlorContactTags) ExpiredTags() []XPlorContactTag {
 	return expiredTags
 }
 
+// PermanentTags returns all permanent tags (no expiration date) that have not been deleted
 func (c *XPlorContactTags) PermanentTags() []XPlorContactTag {
 	permanentTags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -191,6 +210,7 @@ func (c *XPlorContactTags) PermanentTags() []XPlorContactTag {
 	return permanentTags
 }
 
+// TagsByName returns all tags with the specified name that have not been deleted
 func (c *XPlorContactTags) TagsByName(name string) []XPlorContactTag {
 	tags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -201,6 +221,7 @@ func (c *XPlorContactTags) TagsByName(name string) []XPlorContactTag {
 	return tags
 }
 
+// TagsByContact returns all tags for the specified contact ID that have not been deleted
 func (c *XPlorContactTags) TagsByContact(contactID string) []XPlorContactTag {
 	tags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -212,6 +233,7 @@ func (c *XPlorContactTags) TagsByContact(contactID string) []XPlorContactTag {
 	return tags
 }
 
+// TagsBySubscription returns all tags for the specified subscription ID that have not been deleted
 func (c *XPlorContactTags) TagsBySubscription(subscriptionID string) []XPlorContactTag {
 	tags := make([]XPlorContactTag, 0)
 	for _, tag := range c.ContactTags {
@@ -223,7 +245,7 @@ func (c *XPlorContactTags) TagsBySubscription(subscriptionID string) []XPlorCont
 	return tags
 }
 
-// Método para obtener tags únicos por nombre para un contacto
+// UniqueTagNamesForContact returns unique tag names for the specified contact that have not been deleted
 func (c *XPlorContactTags) UniqueTagNamesForContact(contactID string) []string {
 	tagNames := make(map[string]bool)
 	for _, tag := range c.ContactTags {
@@ -239,6 +261,8 @@ func (c *XPlorContactTags) UniqueTagNamesForContact(contactID string) []string {
 	}
 	return result
 }
+
+// String returns a formatted string representation of the contact tag
 func (c *XPlorContactTag) String() string {
 	return fmt.Sprintf("ContactTag %s (Name: %s, ContactID: %s, SubscriptionID: %s, Active: %t)", *c.ID, c.Name, func() string {
 		if c.Contact != nil {
@@ -255,6 +279,8 @@ func (c *XPlorContactTag) String() string {
 }
 
 // XPlorContactTagsParams represents the search parameters for contact tags
+
+// ToValues converts the params to url.Values for query parameters
 type XPlorContactTagsParams struct {
 	ContactID      string
 	ContactIDs     []string

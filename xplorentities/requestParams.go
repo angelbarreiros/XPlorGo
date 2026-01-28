@@ -33,7 +33,7 @@ func BuildPaginationQueryParams(pagination *XPlorPagination) url.Values {
 	return queryParams
 }
 
-// BuildPaginationAndTimeGapParams creates query parameters from pagination and timeGap
+// BuildPaginationAndTimeGapParams creates query parameters from pagination and timeGap with default values
 func BuildPaginationAndTimeGapParams(pagination *XPlorPagination, timeGap *XPlorTimeGap) url.Values {
 	queryParams := url.Values{}
 

@@ -65,15 +65,17 @@ type ActivityGroup struct {
 
 // ----------- Métodos útiles -----------
 
+// ActivityID extracts the activity ID from the @id field
 func (a XPlorActivity) ActivityID() (string, error) {
 	return ExtractID(a.ID, "activity ID field is nil")
 }
 
+// ClubID extracts the club ID from the clubId field
 func (a XPlorActivity) ClubID() (string, error) {
 	return ExtractID(a.ClubId, "club ID field is nil")
 }
 
-// Obtener IDs de Showcase Activities asociadas
+// ShowcaseIDs extracts the IDs from associated showcase activities
 func (a XPlorActivity) ShowcaseIDs() ([]int, error) {
 	var ids []int
 	for _, s := range a.ShowcaseActivities {
@@ -87,17 +89,17 @@ func (a XPlorActivity) ShowcaseIDs() ([]int, error) {
 	return ids, nil
 }
 
-// Chequear si la actividad es activa (no archivada)
+// IsActive checks if the activity is active (not archived)
 func (a XPlorActivity) IsActive() bool {
 	return a.ArchivedAt == nil
 }
 
-// Chequear si la actividad es de PADEL
+// IsPadel checks if the activity name starts with "PADEL"
 func (a XPlorActivity) IsPadel() bool {
 	return len(a.Name) >= 5 && a.Name[:5] == "PADEL"
 }
 
-// Obtener la duración en minutos (si viene en formato ISO 8601, ej: PT60M, PT90M)
+// DurationMinutes extracts the duration in minutes from ISO 8601 format (e.g., PT60M, PT90M)
 func (a XPlorActivity) DurationMinutes() int {
 	if len(a.Durations) == 0 {
 		return 0

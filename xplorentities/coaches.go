@@ -29,6 +29,7 @@ type XPloreCoach struct {
 	ArchivedBy    *string         `json:"archivedBy"`
 }
 
+// ActivityIDs extracts all activity IDs from the activities field
 func (c XPloreCoach) ActivityIDs() []string {
 	var ids []string
 	for _, act := range c.Activities {
@@ -41,6 +42,7 @@ func (c XPloreCoach) ActivityIDs() []string {
 	return ids
 }
 
+// CoachID extracts the coach ID from the @id field
 func (c XPloreCoach) CoachID() (string, error) {
 	return ExtractID(c.Id, "coach ID field is nil")
 }

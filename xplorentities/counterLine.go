@@ -44,18 +44,23 @@ type XPlorCounterLines struct {
 }
 
 // Métodos para XPlorCounterLine
+
+// ContactIDValue extracts the contact ID from the contactId field
 func (cl *XPlorCounterLine) ContactIDValue() (string, error) {
 	return ExtractID(cl.ContactID, " nil contact ID field")
 }
 
+// UnitID extracts the unit ID from the unit field
 func (cl *XPlorCounterLine) UnitID() (string, error) {
 	return ExtractID(cl.Unit, "unit ID field is nil")
 }
 
+// ArticleIDValue extracts the article ID from the articleId field
 func (cl *XPlorCounterLine) ArticleIDValue() (string, error) {
 	return ExtractID(cl.ArticleID, "article ID field is nil")
 }
 
+// CounterMovementIDs extracts all counter movement IDs from the counterMovements field
 func (cl *XPlorCounterLine) CounterMovementIDs() ([]string, error) {
 	if len(cl.CounterMovements) == 0 {
 		return nil, errors.New("no counter movements available")
@@ -72,6 +77,7 @@ func (cl *XPlorCounterLine) CounterMovementIDs() ([]string, error) {
 	return ids, nil
 }
 
+// ServiceID extracts the service ID from the serviceProperty field
 func (cl *XPlorCounterLine) ServiceID() (string, error) {
 	if cl.ServiceProperty == nil || cl.ServiceProperty.Service == nil {
 		return "", errors.New("service ID field is nil")
@@ -80,35 +86,45 @@ func (cl *XPlorCounterLine) ServiceID() (string, error) {
 }
 
 // Métodos para verificar estados
+
+// IsActive checks if the counter line is currently within its validity period
 func (cl *XPlorCounterLine) IsActive() bool {
 	now := util.LocalTime{Time: time.Now()}
 	return cl.ValidFrom.Time.Before(now.Time) && cl.ValidThrough.Time.After(now.Time)
 }
 
+// IsExpired checks if the counter line validity period has expired
 func (cl *XPlorCounterLine) IsExpired() bool {
 	now := util.LocalTime{Time: time.Now()}
 	return cl.ValidThrough.Time.Before(now.Time)
 }
 
+// IsNotStarted checks if the counter line validity period has not started yet
 func (cl *XPlorCounterLine) IsNotStarted() bool {
 	now := util.LocalTime{Time: time.Now()}
 	return cl.ValidFrom.Time.After(now.Time)
 }
 
+// IsDeleted checks if the counter line has been deleted
 func (cl *XPlorCounterLine) IsDeleted() bool {
 	return cl.DeletedAt != nil
 }
 
 // Métodos para XPlorCounterLines (colección)
+
+// CollectionID extracts the collection ID from the @id field
 func (c *XPlorCounterLines) CollectionID() (string, error) {
 	return ExtractIDFromString(c.ID, "collection ID field is empty")
 }
 
+// ContextID extracts the context ID from the @context field
 func (c *XPlorCounterLines) ContextID() (string, error) {
 	return ExtractIDFromString(c.Context, "context ID field is empty")
 }
 
 // Método para obtener todos los IDs de la colección
+
+// AllContactIDs returns all contact IDs from the counter lines collection
 func (c *XPlorCounterLines) AllContactIDs() ([]string, error) {
 	if len(c.CounterLines) == 0 {
 		return nil, errors.New("no counter lines available")

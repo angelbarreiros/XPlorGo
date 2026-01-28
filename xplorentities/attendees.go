@@ -76,6 +76,7 @@ type XPlorClassEvent struct {
 	DefaultOnlineLimit *int    `json:"defaultOnlineLimit"`
 }
 
+// ID extracts the attendee ID from the @id field
 func (a XPlorAttendee) ID() (string, error) {
 	if a.AtID == nil {
 		return "", errors.New("attendee ID field is nil")
@@ -84,6 +85,7 @@ func (a XPlorAttendee) ID() (string, error) {
 	return base, nil
 }
 
+// ContactID extracts the contact ID from the contactId field
 func (a XPlorAttendee) ContactID() (string, error) {
 	if a.ContactId == nil {
 		return "", errors.New("contact ID field is nil")
@@ -94,10 +96,13 @@ func (a XPlorAttendee) ContactID() (string, error) {
 func (a XPlorAttendee) ContactTagId() (string, error) {
 	return ExtractID(a.ContactTagUsed, "contactTag ID field is nil")
 }
+
+// ContactCounterId extracts the contact counter ID from the contactCounterUsed field
 func (a XPlorAttendee) ContactCounterId() (string, error) {
 	return ExtractID(a.ContactCounterUsed, "contactCounter ID field is nil")
 }
 
+// ContactClubID extracts the contact club ID from the contactClubId field
 func (a XPlorAttendee) ContactClubID() (string, error) {
 	if a.ContactClubId == nil {
 		return "", errors.New("contactClub ID field is nil")
@@ -106,6 +111,7 @@ func (a XPlorAttendee) ContactClubID() (string, error) {
 	return base, nil
 }
 
+// ID extracts the class event ID from the @id field
 func (ce XPlorClassEvent) ID() (string, error) {
 	if ce.AtID == nil {
 		return "", errors.New("class event ID field is nil")
@@ -114,6 +120,7 @@ func (ce XPlorClassEvent) ID() (string, error) {
 	return base, nil
 }
 
+// ClubID extracts the club ID from the club field
 func (ce XPlorClassEvent) ClubID() (string, error) {
 	if ce.Club == nil {
 		return "", errors.New("club ID field is nil")
@@ -122,6 +129,7 @@ func (ce XPlorClassEvent) ClubID() (string, error) {
 	return base, nil
 }
 
+// StudioID extracts the studio ID from the studio field
 func (ce XPlorClassEvent) StudioID() (string, error) {
 	if ce.Studio == nil {
 		return "", errors.New("studio ID field is nil")
@@ -130,6 +138,7 @@ func (ce XPlorClassEvent) StudioID() (string, error) {
 	return base, nil
 }
 
+// ActivityID extracts the activity ID from the activity field
 func (ce XPlorClassEvent) ActivityID() (string, error) {
 	if ce.Activity == nil {
 		return "", errors.New("activity ID field is nil")
@@ -138,6 +147,7 @@ func (ce XPlorClassEvent) ActivityID() (string, error) {
 	return base, nil
 }
 
+// CoachID extracts the coach ID from the coach field
 func (ce XPlorClassEvent) CoachID() (string, error) {
 	if ce.Coach == nil {
 		return "", errors.New("coach ID field is nil")
@@ -146,12 +156,12 @@ func (ce XPlorClassEvent) CoachID() (string, error) {
 	return base, nil
 }
 
-// StartedAtTime convierte StartedAt string a time.Time
+// StartedAtTime converts StartedAt string to time.Time
 func (ce XPlorClassEvent) StartedAtTime() (*time.Time, error) {
 	return parseTimeString(ce.StartedAt)
 }
 
-// EndedAtTime convierte EndedAt string a time.Time
+// EndedAtTime converts EndedAt string to time.Time
 func (ce XPlorClassEvent) EndedAtTime() (*time.Time, error) {
 	return parseTimeString(ce.EndedAt)
 }
@@ -160,6 +170,7 @@ type XTime struct {
 	time.Time
 }
 
+// UnmarshalJSON unmarshals JSON bytes into XTime, supporting RFC3339 and custom formats
 func (xt *XTime) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), `"`)
 	if s == "" || s == "null" {
@@ -204,23 +215,27 @@ func (a XPlorAttendee) CreatedAtTime() (*time.Time, error) {
 	return parseTimeString(a.CreatedAt)
 }
 
+// CanceledAtTime converts CanceledAt string to time.Time
 func (a XPlorAttendee) CanceledAtTime() (*time.Time, error) {
 	return parseTimeString(a.CanceledAt)
 }
 
+// ValidatedAtTime converts ValidatedAt string to time.Time
 func (a XPlorAttendee) ValidatedAtTime() (*time.Time, error) {
 	return parseTimeString(a.ValidatedAt)
 }
 
+// QueuedAtTime converts QueuedAt string to time.Time
 func (a XPlorAttendee) QueuedAtTime() (*time.Time, error) {
 	return parseTimeString(a.QueuedAt)
 }
 
+// DeletedAtTime converts DeletedAt string to time.Time
 func (a XPlorAttendee) DeletedAtTime() (*time.Time, error) {
 	return parseTimeString(a.DeletedAt)
 }
 
-// ClassEventStartTime convierte ClassEventStart string a time.Time
+// ClassEventStartTime converts ClassEventStart string to time.Time
 func (a XPlorAttendee) ClassEventStartTime() (*time.Time, error) {
 	return parseTimeString(a.ClassEventStart)
 }

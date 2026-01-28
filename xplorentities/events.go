@@ -68,7 +68,7 @@ type HydraView struct {
 	HydraNext  string `json:"hydra:next"`
 }
 
-// FirstPageNumber extrae el número de página de la URL first
+// FirstPageNumber extracts the page number from the first URL
 func (hv HydraView) FirstPageNumber() (int, error) {
 	if hv.HydraFirst == "" {
 		return 0, errors.New("hydra:first URL is empty")
@@ -84,7 +84,7 @@ func (hv HydraView) FirstPageNumber() (int, error) {
 	return pageInt, nil
 }
 
-// LastPageNumber extrae el número de página de la URL last
+// LastPageNumber extracts the page number from the last URL
 func (hv HydraView) LastPageNumber() (int, error) {
 	if hv.HydraLast == "" {
 		return 1, nil // Return 1 if there's no last page (only one page available)
@@ -100,7 +100,7 @@ func (hv HydraView) LastPageNumber() (int, error) {
 	return pageInt, nil
 }
 
-// NextPageNumber extrae el número de página de la URL next
+// NextPageNumber extracts the page number from the next URL
 func (hv HydraView) NextPageNumber() (int, error) {
 	if hv.HydraNext == "" {
 		return 0, errors.New("hydra:next URL is empty")
@@ -116,7 +116,7 @@ func (hv HydraView) NextPageNumber() (int, error) {
 	return pageInt, nil
 }
 
-// extractPageNumber extrae el parámetro 'page' de una URL
+// extractPageNumber extracts the page parameter from a URL query string
 func extractPageNumber(urlStr string) (string, error) {
 	parsedURL, err := url.Parse(urlStr)
 	if err != nil {
@@ -168,53 +168,53 @@ type Attendee struct {
 func (a Attendee) ContactTagId() (string, error) {
 	return ExtractID(a.ContactTagIdUsed, "contact tag ID field is nil")
 }
+
+// ContactCounterId extracts the contact counter ID from the contactCounterUsed field
 func (a Attendee) ContactCounterId() (string, error) {
 	return ExtractID(a.ContactCounterIdUsed, "contact counter ID field is nil")
 }
 
-// FullName devuelve el nombre completo del asistente
+// FullName returns the full name of the attendee
 func (a Attendee) FullName() string {
 	return a.ContactGivenName + " " + a.ContactFamilyName
 }
 
-// HasContact verifica si el asistente tiene información de contacto
+// HasContact checks if the attendee has contact information
 func (a Attendee) HasContact() bool {
 	return a.ContactID != nil
 }
 
-// ContactIDValue extrae el ID numérico del contacto desde el campo ContactID
+// ContactIDValue extracts the numeric contact ID from the ContactID field
 func (a Attendee) ContactIDValue() (string, error) {
 	return ExtractID(a.ContactID, "contact ID field is nil")
 }
 
-// FullName devuelve el nombre completo del asistente
-
-// ---- Club ----
+// ClubID extracts the club ID from the club field
 func (e XPlorEvent) ClubID() (string, error) {
 	return ExtractID(e.Club, "club field is nil")
 }
 
-// ---- Studio ----
+// StudioID extracts the studio ID from the studio field
 func (e XPlorEvent) StudioID() (string, error) {
 	return ExtractID(e.Studio, "studio field is nil")
 }
 
-// ---- Activity ----
+// ActivityID extracts the activity ID from the activity field
 func (e XPlorEvent) ActivityID() (string, error) {
 	return ExtractID(e.Activity, "activity field is nil")
 }
 
-// ---- Coach ----
+// CoachID extracts the coach ID from the coach field
 func (e XPlorEvent) CoachID() (string, error) {
 	return ExtractID(e.Coach, "coach field is nil")
 }
 
-// ---- Recurrence ----
+// RecurrenceID extracts the recurrence ID from the recurrence field
 func (e XPlorEvent) RecurrenceID() (string, error) {
 	return ExtractID(e.Recurrence, "recurrence field is nil")
 }
 
-// ---- ClassEvent ----
+// EventID extracts the event ID from the @id field
 func (e XPlorEvent) EventID() (string, error) {
 	return ExtractID(e.ID, "event ID field is nil")
 }

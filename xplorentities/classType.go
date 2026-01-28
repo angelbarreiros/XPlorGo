@@ -35,30 +35,38 @@ type HydraSearch struct {
 }
 
 // Métodos para XPlorClassEventType
+
+// ClassEventTypeID extracts the class event type ID from the @id field
 func (cet *XPlorClassType) ClassEventTypeID() (string, error) {
 	return ExtractID(cet.ID, "class event type ID field is nil")
 }
 
+// ClubID extracts the club ID from the club field
 func (cet *XPlorClassType) ClubID() (string, error) {
 	return ExtractID(cet.Club, "club ID field is nil")
 }
+
+// CoachId extracts the coach ID from the coach field
 func (cet *XPlorClassType) CoachId() (string, error) {
 	return ExtractID(cet.Coach, "coach ID field is nil")
 }
 
+// StudioID extracts the studio ID from the studio field
 func (cet *XPlorClassType) StudioID() (string, error) {
 	return ExtractID(cet.Studio, "studio ID field is nil")
 }
 
+// ActivityID extracts the activity ID from the activity field
 func (cet *XPlorClassType) ActivityID() (string, error) {
 	return ExtractID(cet.Activity, "activity ID field is nil")
 }
 
+// RecurrenceID extracts the recurrence ID from the recurrence field
 func (cet *XPlorClassType) RecurrenceID() (string, error) {
 	return ExtractID(cet.Recurrence, "recurrence ID field is nil")
 }
 
-// Método para obtener el ID interno (campo "id")
+// InternalIDValue returns the internal ID value from the id field
 func (cet *XPlorClassType) InternalIDValue() int {
 	return cet.InternalID
 }

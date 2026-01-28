@@ -71,36 +71,44 @@ type XPlorAddress struct {
 
 // Métodos helpers para extraer IDs -----------------
 
+// ContactID extracts the contact ID from the @id field
 func (c XPlorContact) ContactID() (string, error) {
 	return ExtractID(c.ID, "contact ID field is nil")
 }
 
+// ClubIDValue extracts the club ID from the clubId field
 func (c XPlorContact) ClubIDValue() (string, error) {
 	return ExtractID(c.ClubID, "club ID field is nil")
 }
 
+// PictureIDValue extracts the picture ID from the pictureId field
 func (c XPlorContact) PictureIDValue() (string, error) {
 	return ExtractID(c.PictureID, "picture ID field is nil")
 }
 
+// GoalIDValue extracts the goal ID from the goalId field
 func (c XPlorContact) GoalIDValue() (string, error) {
 	return ExtractID(c.GoalID, "goal ID field is nil")
 }
 
+// InitialSalepersonIDValue extracts the initial salesperson ID from the initialSalepersonId field
 func (c XPlorContact) InitialSalepersonIDValue() (string, error) {
 	return ExtractID(c.InitialSalepersonID, "initial salesperson ID field is nil")
 }
 
+// CurrentSalepersonIDValue extracts the current salesperson ID from the currentSalepersonId field
 func (c XPlorContact) CurrentSalepersonIDValue() (string, error) {
 	return ExtractID(c.CurrentSalepersonID, "current salesperson ID field is nil")
 }
 
 // Para Address
+
+// AddressID extracts the address ID from the @id field
 func (a XPlorAddress) AddressID() (string, error) {
 	return ExtractID(a.ID, "address ID field is nil")
 }
 
-// Helper para concatenar dirección completa
+// FullAddress returns the complete concatenated address string
 func (a XPlorAddress) FullAddress() string {
 	parts := []string{}
 	if a.StreetAddress != "" {
@@ -117,6 +125,8 @@ func (a XPlorAddress) FullAddress() string {
 	}
 	return strings.Join(parts, ", ")
 }
+
+// Age calculates the contact's age based on their birth date
 func (c XPlorContact) Age() (*int, error) {
 	if c.BirthDate.IsZero() {
 		return nil, errors.New("birth date is empty")

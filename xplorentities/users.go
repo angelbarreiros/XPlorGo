@@ -2,6 +2,7 @@ package xplorentities
 
 import (
 	"path"
+	"slices"
 	"time"
 
 	"github.com/angelbarreiros/XPlorGo/util"
@@ -118,12 +119,7 @@ func (u XPlorUser) FullName() string {
 
 // HasRole checks if the user has a specific role
 func (u XPlorUser) HasRole(role string) bool {
-	for _, r := range u.Roles {
-		if r == role {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(u.Roles, role)
 }
 
 // GetCreatedAt returns the creation time

@@ -53,7 +53,7 @@ type XPlorZonesParams struct {
 	Name    string
 }
 
-// ToValues converts the params to url.Values for query parameters
+// ToValues converts the zone search parameters to url.Values for query parameters
 func (p XPlorZonesParams) ToValues(values *url.Values) {
 	clubID := strings.TrimSpace(p.ClubID)
 	if clubID != "" {
@@ -71,12 +71,12 @@ func (p XPlorZonesParams) ToValues(values *url.Values) {
 	}
 }
 
-// ZoneID returns the zone ID extracted from the @id field
+// ZoneID extracts the zone ID from the @id field
 func (z XPlorZone) ZoneID() (string, error) {
 	return ExtractID(z.ID, "zone ID field is nil")
 }
 
-// ClubID returns the club ID as an integer
+// ClubIDInt returns the club ID as an integer
 func (z XPlorZone) ClubIDInt() (int, error) {
 	clubIDPtr := &z.ClubID
 	return ExtractIDInt(clubIDPtr, "club ID field is nil")

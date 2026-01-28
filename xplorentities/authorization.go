@@ -9,19 +9,19 @@ type XPlorTokenResponse struct {
 	Scope       string `json:"scope"`
 }
 
-// XPlorTokenWithTimestamp envuelve el token con información de cuándo se obtuvo
+// XPlorTokenWithTimestamp wraps a token response with its obtention timestamp
 type XPlorTokenWithTimestamp struct {
 	Token      *XPlorTokenResponse
 	ObtainedAt time.Time
 }
 
-// IsExpired verifica si el token ha expirado
+// IsExpired checks if the token has expired based on the obtained timestamp and expiration time
 func (t *XPlorTokenWithTimestamp) IsExpired() bool {
 	expirationTime := t.ObtainedAt.Add(time.Duration(t.Token.ExpiresIn) * time.Second)
 	return time.Now().After(expirationTime)
 }
 
-// IsValid verifica si el token es válido (no nil, no vacío, no expirado)
+// IsValid checks if the token is valid (not nil, not empty, and not expired)
 func (t *XPlorTokenWithTimestamp) IsValid() bool {
 	if t.Token == nil {
 		return false

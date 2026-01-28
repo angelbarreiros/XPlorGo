@@ -23,26 +23,27 @@ type XPlorNetworkNode struct {
 
 // ---------------- Métodos helpers ----------------
 
-// Devuelve el ID numérico a partir de @id (ej: "/enjoy/network_nodes/1359" → 1359)
+// NetworkNodeID extracts the network node ID from the @id field
 func (n XPlorNetworkNode) NetworkNodeID() (string, error) {
 	return ExtractID(n.NotworkNodeID, "network node hydra ID field is nil")
 }
 
-// Devuelve el ClubID numérico si existe (ej: "/enjoy/clubs/1249" → 1249)
+// ClubIDValue extracts the club ID from the clubId field if it exists
 func (n XPlorNetworkNode) ClubIDValue() (string, error) {
 	return ExtractID(n.ClubID, "club ID field is nil")
 }
 
-// Saber si es un "club"
+// IsClub checks if the network node type is "club"
 func (n XPlorNetworkNode) IsClub() bool {
 	return n.NodeType == "club"
 }
 
-// Saber si es un "grupo" o "franquicia"
+// IsGroup checks if the network node type is "group" or "franchise"
 func (n XPlorNetworkNode) IsGroup() bool {
 	return n.NodeType == "group"
 }
 
+// IsFranchise checks if the network node type is "franchise"
 func (n XPlorNetworkNode) IsFranchise() bool {
 	return n.NodeType == "franchise"
 }
