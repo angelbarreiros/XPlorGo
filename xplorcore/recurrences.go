@@ -17,7 +17,7 @@ func (xe xplorExecutor) recurrences(accesToken string, params *xplorentities.XPl
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
 		if params != nil {
-			params.ToValues(&queryParams)
+			params.ToValues(xe.config.EnterpriseName, &queryParams)
 		}
 		formData := url.Values{}
 

@@ -338,6 +338,16 @@ func (rc *XPlorRecurrences) AllClubIDs() ([]string, error) {
 
 // XPlorRecurrencesParams represents the search parameters for recurrences
 type XPlorRecurrencesParams struct {
+	Day                     *string
+	Days                    []string
+	ClubId                  *string
+	ClubIds                 []string
+	ActivityId              *string
+	ActivityIds             []string
+	CoachId                 *string
+	CoachIds                []string
+	StudioId                *string
+	StudioIds               []string
 	StartedAtBefore         *time.Time
 	StartedAtStrictlyBefore *time.Time
 	StartedAtAfter          *time.Time
@@ -346,12 +356,52 @@ type XPlorRecurrencesParams struct {
 	EndedAtStrictlyBefore   *time.Time
 	EndedAtAfter            *time.Time
 	EndedAtStrictlyAfter    *time.Time
-	Week                    string
-	Club                    string
+	Week                    *string
+	IncludeFutureClassEvent *string
 }
 
 // ToValues converts the params to url.Values for query parameters
-func (p XPlorRecurrencesParams) ToValues(values *url.Values) {
+func (p XPlorRecurrencesParams) ToValues(orgName string, values *url.Values) {
+	// Day filters
+	if p.Day != nil {
+		values.Set("day", *p.Day)
+	}
+	for _, day := range p.Days {
+		values.Add("day[]", day)
+	}
+
+	// Club filters
+	if p.ClubId != nil {
+		values.Set("classEventType.club", "/"+orgName+"/clubs/"+*p.ClubId)
+	}
+	for _, clubId := range p.ClubIds {
+		values.Add("classEventType.club[]", "/"+orgName+"/clubs/"+clubId)
+	}
+
+	// Activity filters
+	if p.ActivityId != nil {
+		values.Set("classEventType.activity", "/"+orgName+"/activities/"+*p.ActivityId)
+	}
+	for _, activityId := range p.ActivityIds {
+		values.Add("classEventType.activity[]", "/"+orgName+"/activities/"+activityId)
+	}
+
+	// Coach filters
+	if p.CoachId != nil {
+		values.Set("classEventType.coach", "/"+orgName+"/coaches/"+*p.CoachId)
+	}
+	for _, coachId := range p.CoachIds {
+		values.Add("classEventType.coach[]", "/"+orgName+"/coaches/"+coachId)
+	}
+
+	// Studio filters
+	if p.StudioId != nil {
+		values.Set("classEventType.studio", "/"+orgName+"/studios/"+*p.StudioId)
+	}
+	for _, studioId := range p.StudioIds {
+		values.Add("classEventType.studio[]", "/"+orgName+"/studios/"+studioId)
+	}
+
 	// StartedAt date filters
 	if p.StartedAtBefore != nil {
 		values.Set("startedAt[before]", p.StartedAtBefore.Format("2006-01-02T15:04:05"))
@@ -379,13 +429,14 @@ func (p XPlorRecurrencesParams) ToValues(values *url.Values) {
 	if p.EndedAtStrictlyAfter != nil {
 		values.Set("endedAt[strictly_after]", p.EndedAtStrictlyAfter.Format("2006-01-02T15:04:05"))
 	}
-	// Club filter
-	if p.Club != "" {
-		values.Set("club", p.Club)
-	}
 
 	// Week filter
-	if p.Week != "" {
-		values.Set("week", p.Week)
+	if p.Week != nil {
+		values.Set("week", *p.Week)
+	}
+
+	// IncludeFutureClassEvent filter
+	if p.IncludeFutureClassEvent != nil {
+		values.Set("includeFutureClassEvent", *p.IncludeFutureClassEvent)
 	}
 }
