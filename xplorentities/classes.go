@@ -180,7 +180,7 @@ func (p XPlorClassesParams) ToValues(orgName string, values *url.Values) {
 		values.Set("studio", *p.Studio)
 	}
 	if p.Recurrence != nil {
-		values.Set("clubId", "/"+orgName+"/recurrences/"+*p.Recurrence)
+		values.Set("recurrence", "/"+orgName+"/recurrences/"+*p.Recurrence)
 	}
 	if p.AttendeeContactID != nil {
 		values.Set("attendees.contactId", *p.AttendeeContactID)

@@ -17,6 +17,7 @@ func (xe xplorExecutor) authenticate() (*xplorentities.XPlorTokenResponse, *xplo
 	go func() {
 		var header = map[string]string{
 			"Content-Type": "application/x-www-form-urlencoded",
+			"grant_type":   "client_credentials",
 		}
 		formData := url.Values{}
 		formData.Set("grant_type", "client_credentials")
