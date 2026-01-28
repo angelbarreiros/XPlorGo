@@ -18,7 +18,7 @@ type XPlorZones struct {
 
 // XPlorZone represents an individual zone
 type XPlorZone struct {
-	Context       interface{}     `json:"@context,omitempty"`
+	Context       any             `json:"@context,omitempty"`
 	ID            *string         `json:"@id"`
 	Type          string          `json:"@type"`
 	Name          string          `json:"name"`
@@ -43,7 +43,7 @@ type ZoneParent struct {
 // ZoneConfig represents zone configuration
 type ZoneConfig struct {
 	// Add specific configuration fields as needed based on API response
-	Settings map[string]interface{} `json:"settings,omitempty"`
+	Settings map[string]any `json:"settings,omitempty"`
 }
 
 // XPlorZonesParams represents the search parameters for zones

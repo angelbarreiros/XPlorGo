@@ -25,13 +25,13 @@ type XPlorCounterLine struct {
 	CreatedBy         string                      `json:"createdBy"`
 	UpdatedAt         util.LocalTime              `json:"updatedAt"`
 	DeletedAt         *util.LocalTime             `json:"deletedAt,omitempty"`
-	DeletedBy         interface{}                 `json:"deletedBy,omitempty"`
+	DeletedBy         any                         `json:"deletedBy,omitempty"`
 }
 
 // CounterLineServiceProperty representa las propiedades de servicio de una línea de contador
 type CounterLineServiceProperty struct {
-	Service    *string                `json:"service"`
-	Properties map[string]interface{} `json:"properties"`
+	Service    *string        `json:"service"`
+	Properties map[string]any `json:"properties"`
 }
 
 // XPlorCounterLines representa una colección de líneas de contador

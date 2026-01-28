@@ -23,41 +23,41 @@ type XPlorClasses struct {
 type XPlorClass struct {
 	ID                                 *string         `json:"@id"`
 	Type                               string          `json:"@type"`
-	Context                            interface{}     `json:"@context"`
+	Context                            any             `json:"@context"`
 	Club                               *string         `json:"club"`
 	Studio                             *string         `json:"studio"`
 	Activity                           *string         `json:"activity"`
 	Coach                              *string         `json:"coach"`
 	AttendingLimit                     *int            `json:"attendingLimit"`
 	QueueLimit                         int             `json:"queueLimit"`
-	PrivateComment                     interface{}     `json:"privateComment"`
+	PrivateComment                     any             `json:"privateComment"`
 	Recurrence                         *string         `json:"recurrence"`
-	ClassLayout                        interface{}     `json:"classLayout"`
-	ClassLayoutConfiguration           []interface{}   `json:"classLayoutConfiguration"`
+	ClassLayout                        any             `json:"classLayout"`
+	ClassLayoutConfiguration           any             `json:"classLayoutConfiguration"`
 	DisabledItems                      []string        `json:"disabledItems"`
-	InstructionsComment                interface{}     `json:"instructionsComment"`
-	OnlineLimit                        interface{}     `json:"onlineLimit"`
-	ExternalQuota                      interface{}     `json:"externalQuota"`
+	InstructionsComment                any             `json:"instructionsComment"`
+	OnlineLimit                        any             `json:"onlineLimit"`
+	ExternalQuota                      any             `json:"externalQuota"`
 	CoachAvailable                     bool            `json:"coachAvailable"`
 	StartedAt                          LocalTime       `json:"startedAt"`
 	EndedAt                            LocalTime       `json:"endedAt"`
 	Summary                            string          `json:"summary"`
-	Description                        interface{}     `json:"description"`
+	Description                        any             `json:"description"`
 	CreatedAt                          *LocalTime      `json:"createdAt"`
 	CreatedBy                          string          `json:"createdBy"`
 	UpdatedAt                          *LocalTime      `json:"updatedAt"`
 	UpdatedBy                          string          `json:"updatedBy"`
 	DeletedAt                          *util.LocalTime `json:"deletedAt"`
-	DeletedBy                          interface{}     `json:"deletedBy"`
-	ArchivedAt                         interface{}     `json:"archivedAt"`
-	ArchivedBy                         interface{}     `json:"archivedBy"`
+	DeletedBy                          any             `json:"deletedBy"`
+	ArchivedAt                         any             `json:"archivedAt"`
+	ArchivedBy                         any             `json:"archivedBy"`
 	Processing                         bool            `json:"processing"`
 	BookedAttendees                    []Attendee      `json:"bookedAttendees"`
 	QueuedAttendees                    []Attendee      `json:"queuedAttendees"`
 	AutoPromoteQueuedAttendeesPossible bool            `json:"autoPromoteQueuedAttendeesPossible"`
 	AttendeeRemaining                  int             `json:"attendeeRemaining"`
 	QueueRemaining                     int             `json:"queueRemaining"`
-	DefaultOnlineLimit                 interface{}     `json:"defaultOnlineLimit"`
+	DefaultOnlineLimit                 any             `json:"defaultOnlineLimit"`
 }
 
 // Métodos para obtener IDs

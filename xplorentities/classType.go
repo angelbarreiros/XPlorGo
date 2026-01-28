@@ -11,20 +11,20 @@ type XPlorClassType struct {
 	StartedAt           *util.LocalTime `json:"startedAt"`
 	EndedAt             *util.LocalTime `json:"endedAt"`
 	Summary             string          `json:"summary"`
-	Description         interface{}     `json:"description"`
+	Description         any             `json:"description"`
 	Club                *string         `json:"club"`
 	Studio              *string         `json:"studio"`
 	Activity            *string         `json:"activity"`
 	Coach               *string         `json:"coach"`
 	AttendingLimit      int             `json:"attendingLimit"`
 	QueueLimit          int             `json:"queueLimit"`
-	PrivateComment      interface{}     `json:"privateComment"`
+	PrivateComment      any             `json:"privateComment"`
 	Recurrence          *string         `json:"recurrence"`
-	ClassLayout         interface{}     `json:"classLayout"`
-	InstructionsComment interface{}     `json:"instructionsComment"`
-	OnlineLimit         interface{}     `json:"onlineLimit"`
-	ExternalQuota       interface{}     `json:"externalQuota"`
-	ImportRequestId     interface{}     `json:"importRequestId"`
+	ClassLayout         any             `json:"classLayout"`
+	InstructionsComment any             `json:"instructionsComment"`
+	OnlineLimit         any             `json:"onlineLimit"`
+	ExternalQuota       any             `json:"externalQuota"`
+	ImportRequestId     any             `json:"importRequestId"`
 }
 
 type HydraSearch struct {

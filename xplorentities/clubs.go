@@ -6,7 +6,7 @@ import (
 )
 
 type XPloreClubs struct {
-	Context    interface{} `json:"@context"` // Cambiado a interface{} para permitir string o object
+	Context    any         `json:"@context"` // Cambiado a any para permitir string o object
 	ID         string      `json:"@id"`
 	Type       string      `json:"@type"`
 	Clubs      []XPlorClub `json:"hydra:member"`
@@ -16,7 +16,7 @@ type XPloreClubs struct {
 type XPlorClub struct {
 	ID                string        `json:"@id"` // Cambiado de *string a string (no nullable según spec)
 	Type              string        `json:"@type"`
-	Context           interface{}   `json:"@context"`          // Agregado, interface{} para string or object
+	Context           any           `json:"@context"`          // Agregado, any para string or object
 	ClubNumberID      int           `json:"id"`                // Cambiado de ClubNumberID a id para coincidir
 	Number            *string       `json:"number"`            // Nullable, string [3..7] chars
 	Code              string        `json:"code"`              // Required, string [3..5] chars
@@ -59,26 +59,26 @@ type ResaboxNotification struct {
 // Nuevas estructuras según spec
 
 type ClubTag struct {
-	Context interface{} `json:"@context"`
-	ID      string      `json:"@id"`
-	Type    string      `json:"@type"`
-	Title   *string     `json:"title"`
+	Context any     `json:"@context"`
+	ID      string  `json:"@id"`
+	Type    string  `json:"@type"`
+	Title   *string `json:"title"`
 	// ... otros campos según ClubTag.jsonld-read_sale_terms_light_norm
 }
 
 type ClubMetadata struct {
-	Context     interface{} `json:"@context"`
-	ID          string      `json:"@id"`
-	Type        string      `json:"@type"`
-	Title       *string     `json:"title"`
-	Description *string     `json:"description"`
-	Locale      *string     `json:"locale"`
+	Context     any     `json:"@context"`
+	ID          string  `json:"@id"`
+	Type        string  `json:"@type"`
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+	Locale      *string `json:"locale"`
 }
 
 type SaleTerms struct {
-	Context interface{} `json:"@context"`
-	ID      string      `json:"@id"`
-	Type    string      `json:"@type"`
+	Context any    `json:"@context"`
+	ID      string `json:"@id"`
+	Type    string `json:"@type"`
 	// ... otros campos según SaleTerms.jsonld-read_sale_terms_light_norm
 }
 

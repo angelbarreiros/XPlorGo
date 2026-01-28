@@ -33,8 +33,8 @@ type XPlorRecurrence struct {
 	Processing                   bool            `json:"processing"`
 	DeletedAt                    *util.LocalTime `json:"deletedAt"`
 	DeletedBy                    *string         `json:"deletedBy"`
-	Action                       interface{}     `json:"action"`
-	CourseWaitingListRecurrences []interface{}   `json:"courseWaitingListRecurrences"`
+	Action                       any             `json:"action"`
+	CourseWaitingListRecurrences any             `json:"courseWaitingListRecurrences"`
 }
 
 type ClassEventType struct {
@@ -50,11 +50,11 @@ type ClassEventType struct {
 	Coach               *string        `json:"coach"`
 	AttendingLimit      int            `json:"attendingLimit"`
 	QueueLimit          int            `json:"queueLimit"`
-	PrivateComment      interface{}    `json:"privateComment"`
-	ClassLayout         interface{}    `json:"classLayout"`
-	InstructionsComment interface{}    `json:"instructionsComment"`
-	OnlineLimit         interface{}    `json:"onlineLimit"`
-	ExternalQuota       interface{}    `json:"externalQuota"`
+	PrivateComment      any            `json:"privateComment"`
+	ClassLayout         any            `json:"classLayout"`
+	InstructionsComment any            `json:"instructionsComment"`
+	OnlineLimit         any            `json:"onlineLimit"`
+	ExternalQuota       any            `json:"externalQuota"`
 }
 
 // Función genérica para extraer IDs de strings (no punteros)

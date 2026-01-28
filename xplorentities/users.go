@@ -24,12 +24,12 @@ type XPlorUsers struct {
 type XPlorUser struct {
 	AtID           *string         `json:"@id"`
 	AtType         *string         `json:"@type"`
-	AtContext      interface{}     `json:"@context"`
+	AtContext      any             `json:"@context"`
 	PictureLink    *string         `json:"pictureLink"`
 	Code           *string         `json:"code"`
 	ClubIds        []*string       `json:"clubIds"`
 	Mobile         *string         `json:"mobile"`
-	Properties     interface{}     `json:"properties"`
+	Properties     any             `json:"properties"`
 	NetworkNodeIds []*string       `json:"networkNodeIds"`
 	Email          string          `json:"email"`
 	FamilyName     string          `json:"familyName"`
@@ -79,8 +79,8 @@ func (u XPlorUser) NetworkNodeIDs() []string {
 // PropertiesNetworkNodeIDs extracts the base IDs from properties network node IRIs
 func (u XPlorUser) PropertiesNetworkNodeIDs() []string {
 	var ids []string
-	if props, ok := u.Properties.(map[string]interface{}); ok {
-		if nnids, ok := props["networkNodeIds"].([]interface{}); ok {
+	if props, ok := u.Properties.(map[string]any); ok {
+		if nnids, ok := props["networkNodeIds"].([]any); ok {
 			for _, n := range nnids {
 				if s, ok := n.(string); ok {
 					base := path.Base(s)

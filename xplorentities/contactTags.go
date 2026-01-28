@@ -16,13 +16,13 @@ type XPlorContactTag struct {
 	Type               string          `json:"@type"`
 	Contact            *string         `json:"contact"`
 	Subscription       *string         `json:"subscription"`
-	SubscriptionOption interface{}     `json:"subscriptionOption"`
+	SubscriptionOption any             `json:"subscriptionOption"`
 	Name               string          `json:"name"`
 	ValidFrom          util.LocalTime  `json:"validFrom"`
 	ValidThrough       *util.LocalTime `json:"validThrough,omitempty"`
 	CreatedAt          *util.LocalTime `json:"createdAt"`
 	DeletedAt          *util.LocalTime `json:"deletedAt,omitempty"`
-	DeletedBy          interface{}     `json:"deletedBy,omitempty"`
+	DeletedBy          any             `json:"deletedBy,omitempty"`
 }
 
 // XPlorContactTags representa una colección de tags de contacto

@@ -19,59 +19,59 @@ type XPlorSubscriptions struct {
 
 // XPlorSubscription representa una suscripción individual
 type XPlorSubscription struct {
-	Id                      *string                `json:"@id"`
-	Type                    string                 `json:"@type"`
-	Contact                 Contact                `json:"contact"`
-	Name                    string                 `json:"name"`
-	TagName                 string                 `json:"tagName"`
-	ValidFrom               string                 `json:"validFrom"`
-	ValidThrough            string                 `json:"validThrough"`
-	EngagedThrough          string                 `json:"engagedThrough"`
-	TerminatedAt            string                 `json:"terminatedAt"`
-	Unlimited               bool                   `json:"unlimited"`
-	CreatedAt               string                 `json:"createdAt"`
-	CreatedBy               string                 `json:"createdBy"`
-	UpdatedAt               string                 `json:"updatedAt"`
-	Consumed                bool                   `json:"consumed"`
-	SubscriptionOptions     []SubscriptionOption   `json:"subscriptionOptions"`
-	ArticleId               string                 `json:"articleId"`
-	Tags                    []string               `json:"tags"`
-	SuspensionQuota         int                    `json:"suspensionQuota"`
-	Warranties              []Warranty             `json:"warranties"`
-	WarrantyInfo            []interface{}          `json:"warrantyInfo"`
-	WarrantyState           string                 `json:"warrantyState"`
-	ClubId                  string                 `json:"clubId"`
-	NoticePeriod            *string                `json:"noticePeriod"`
-	FixedPeriod             bool                   `json:"fixedPeriod"`
-	EngagementRenewal       EngagementRenewal      `json:"engagementRenewal"`
-	StatisticsDisabled      bool                   `json:"statisticsDisabled"`
-	ServiceProperty         ServiceProperty        `json:"serviceProperty"`
-	InitialInfo             InitialInfo            `json:"initialInfo"`
-	Payments                []Payment              `json:"payments"`
-	OfferName               string                 `json:"offerName"`
-	ProductionCode          string                 `json:"productionCode"`
-	ProductName             *string                `json:"productName"`
-	BillingRhythm           string                 `json:"billingRhythm"`
-	RhythmBilling           string                 `json:"rhythmBilling"`
-	ProductDescription      string                 `json:"productDescription"`
-	IsOldComputedSchedule   bool                   `json:"isOldComputedSchedule"`
-	SharedResource          SharedResource         `json:"sharedResource"`
-	AutoRenewal             bool                   `json:"autoRenewal"`
-	RenewalExpiredAt        string                 `json:"renewalExpiredAt"`
-	RenewalInfo             []RenewalInfo          `json:"renewalInfo"`
-	NextRenewalDate         string                 `json:"nextRenewalDate"`
-	RenewalContact          Contact                `json:"renewalContact"`
-	InclusiveValidThrough   string                 `json:"inclusiveValidThrough"`
-	InclusiveEngagedThrough string                 `json:"inclusiveEngagedThrough"`
-	InclusiveEndDate        string                 `json:"inclusiveEndDate"`
-	RenewalType             string                 `json:"renewalType"`
-	PaymentInfo             PaymentInfoItem        `json:"paymentInfo"`
-	RegularDebitDay         int                    `json:"regularDebitDay"`
-	Family                  string                 `json:"family"`
-	Properties              map[string]interface{} `json:"properties"`
-	CounterLineAutoRenewal  any                    `json:"counterLineAutoRenewal"`
-	CurrentDate             int                    `json:"currentDate"`
-	Counters                []Counter              `json:"counters"`
+	Id                      *string              `json:"@id"`
+	Type                    string               `json:"@type"`
+	Contact                 Contact              `json:"contact"`
+	Name                    string               `json:"name"`
+	TagName                 string               `json:"tagName"`
+	ValidFrom               string               `json:"validFrom"`
+	ValidThrough            string               `json:"validThrough"`
+	EngagedThrough          string               `json:"engagedThrough"`
+	TerminatedAt            string               `json:"terminatedAt"`
+	Unlimited               bool                 `json:"unlimited"`
+	CreatedAt               string               `json:"createdAt"`
+	CreatedBy               string               `json:"createdBy"`
+	UpdatedAt               string               `json:"updatedAt"`
+	Consumed                bool                 `json:"consumed"`
+	SubscriptionOptions     []SubscriptionOption `json:"subscriptionOptions"`
+	ArticleId               string               `json:"articleId"`
+	Tags                    []string             `json:"tags"`
+	SuspensionQuota         int                  `json:"suspensionQuota"`
+	Warranties              []Warranty           `json:"warranties"`
+	WarrantyInfo            any                  `json:"warrantyInfo"`
+	WarrantyState           string               `json:"warrantyState"`
+	ClubId                  string               `json:"clubId"`
+	NoticePeriod            *string              `json:"noticePeriod"`
+	FixedPeriod             bool                 `json:"fixedPeriod"`
+	EngagementRenewal       EngagementRenewal    `json:"engagementRenewal"`
+	StatisticsDisabled      bool                 `json:"statisticsDisabled"`
+	ServiceProperty         ServiceProperty      `json:"serviceProperty"`
+	InitialInfo             InitialInfo          `json:"initialInfo"`
+	Payments                []Payment            `json:"payments"`
+	OfferName               string               `json:"offerName"`
+	ProductionCode          string               `json:"productionCode"`
+	ProductName             *string              `json:"productName"`
+	BillingRhythm           string               `json:"billingRhythm"`
+	RhythmBilling           string               `json:"rhythmBilling"`
+	ProductDescription      string               `json:"productDescription"`
+	IsOldComputedSchedule   bool                 `json:"isOldComputedSchedule"`
+	SharedResource          SharedResource       `json:"sharedResource"`
+	AutoRenewal             bool                 `json:"autoRenewal"`
+	RenewalExpiredAt        string               `json:"renewalExpiredAt"`
+	RenewalInfo             []RenewalInfo        `json:"renewalInfo"`
+	NextRenewalDate         string               `json:"nextRenewalDate"`
+	RenewalContact          Contact              `json:"renewalContact"`
+	InclusiveValidThrough   string               `json:"inclusiveValidThrough"`
+	InclusiveEngagedThrough string               `json:"inclusiveEngagedThrough"`
+	InclusiveEndDate        string               `json:"inclusiveEndDate"`
+	RenewalType             string               `json:"renewalType"`
+	PaymentInfo             PaymentInfoItem      `json:"paymentInfo"`
+	RegularDebitDay         int                  `json:"regularDebitDay"`
+	Family                  string               `json:"family"`
+	Properties              map[string]any       `json:"properties"`
+	CounterLineAutoRenewal  any                  `json:"counterLineAutoRenewal"`
+	CurrentDate             int                  `json:"currentDate"`
+	Counters                []Counter            `json:"counters"`
 }
 
 // Contact representa la información de contacto
@@ -86,21 +86,21 @@ type Contact struct {
 
 // InitialInfo representa la información inicial de la suscripción
 type InitialInfo struct {
-	OfferName             string        `json:"offerName"`
-	ProductCode           string        `json:"productCode"`
-	ProductDescription    string        `json:"productDescription"`
-	ProductName           string        `json:"productName"`
-	Payments              []interface{} `json:"payments"`
-	BillingRhythm         string        `json:"billingRhythm"`
-	RhythmBilling         string        `json:"rhythmBilling"`
-	IsOldComputedSchedule bool          `json:"isOldComputedSchedule"`
+	OfferName             string `json:"offerName"`
+	ProductCode           string `json:"productCode"`
+	ProductDescription    string `json:"productDescription"`
+	ProductName           string `json:"productName"`
+	Payments              any    `json:"payments"`
+	BillingRhythm         string `json:"billingRhythm"`
+	RhythmBilling         string `json:"rhythmBilling"`
+	IsOldComputedSchedule bool   `json:"isOldComputedSchedule"`
 }
 
 // RenewalInfo representa la información de renovación
 type RenewalInfo struct {
 	ActivatedAt        util.LocalDate `json:"activatedAt"`
-	RenewalDay         interface{}    `json:"renewalDay"`
-	RenewalWeekDay     interface{}    `json:"renewalWeekDay"`
+	RenewalDay         any            `json:"renewalDay"`
+	RenewalWeekDay     any            `json:"renewalWeekDay"`
 	RenewalPeriod      string         `json:"renewalPeriod"`
 	ProductName        string         `json:"productName"`
 	ProductCode        string         `json:"productCode"`
@@ -112,11 +112,11 @@ type RenewalInfo struct {
 
 // Amount representa el monto de pago
 type Amount struct {
-	Type    string      `json:"type"`
-	PriceTE int         `json:"priceTE"`
-	PriceTI int         `json:"priceTI"`
-	Tax     int         `json:"tax"`
-	Month   interface{} `json:"month"`
+	Type    string `json:"type"`
+	PriceTE int    `json:"priceTE"`
+	PriceTI int    `json:"priceTI"`
+	Tax     int    `json:"tax"`
+	Month   any    `json:"month"`
 }
 
 // PaymentInfo representa la información de pago
@@ -128,7 +128,7 @@ type PaymentInfo struct {
 // CurrentPayment representa el pago actual
 type CurrentPayment struct {
 	ActivatedAt   util.LocalDate `json:"activatedAt"`
-	Day           interface{}    `json:"day"`
+	Day           any            `json:"day"`
 	PriceTE       int            `json:"priceTE"`
 	PriceTI       int            `json:"priceTI"`
 	Tax           int            `json:"tax"`
@@ -143,7 +143,7 @@ type CurrentPayment struct {
 // Payment representa un pago individual
 type Payment struct {
 	ActivatedAt   util.LocalDate `json:"activatedAt"`
-	Day           interface{}    `json:"day"`
+	Day           any            `json:"day"`
 	PriceTE       int            `json:"priceTE"`
 	PriceTI       int            `json:"priceTI"`
 	Tax           int            `json:"tax"`
@@ -157,49 +157,49 @@ type Payment struct {
 
 // SubscriptionOption representa una opción de suscripción
 type SubscriptionOption struct {
-	ArticleId               string                 `json:"articleId"`
-	Tags                    []string               `json:"tags"`
-	SuspensionQuota         int                    `json:"suspensionQuota"`
-	Warranties              []Warranty             `json:"warranties"`
-	WarrantyInfo            []interface{}          `json:"warrantyInfo"`
-	WarrantyState           string                 `json:"warrantyState"`
-	ClubId                  string                 `json:"clubId"`
-	NoticePeriod            *string                `json:"noticePeriod"`
-	FixedPeriod             bool                   `json:"fixedPeriod"`
-	EngagementRenewal       EngagementRenewal      `json:"engagementRenewal"`
-	StatisticsDisabled      bool                   `json:"statisticsDisabled"`
-	ServiceProperty         ServiceProperty        `json:"serviceProperty"`
-	InitialInfo             InitialInfo            `json:"initialInfo"`
-	Payments                []Payment              `json:"payments"`
-	OfferName               string                 `json:"offerName"`
-	ProductionCode          string                 `json:"productionCode"`
-	ProductName             *string                `json:"productName"`
-	BillingRhythm           string                 `json:"billingRhythm"`
-	RhythmBilling           string                 `json:"rhythmBilling"`
-	ProductDescription      string                 `json:"productDescription"`
-	IsOldComputedSchedule   bool                   `json:"isOldComputedSchedule"`
-	SharedResource          SharedResource         `json:"sharedResource"`
-	AutoRenewal             bool                   `json:"autoRenewal"`
-	RenewalExpiredAt        string                 `json:"renewalExpiredAt"`
-	RenewalInfo             []RenewalInfo          `json:"renewalInfo"`
-	NextRenewalDate         string                 `json:"nextRenewalDate"`
-	RenewalContact          Contact                `json:"renewalContact"`
-	InclusiveValidThrough   string                 `json:"inclusiveValidThrough"`
-	InclusiveEngagedThrough string                 `json:"inclusiveEngagedThrough"`
-	InclusiveEndDate        string                 `json:"inclusiveEndDate"`
-	RenewalType             string                 `json:"renewalType"`
-	PaymentInfo             []PaymentInfoItem      `json:"paymentInfo"`
-	RegularDebitDay         int                    `json:"regularDebitDay"`
-	Family                  string                 `json:"family"`
-	Properties              map[string]interface{} `json:"properties"`
-	CounterLineAutoRenewal  any                    `json:"counterLineAutoRenewal"`
-	CurrentDate             int                    `json:"currentDate"`
-	Counters                []Counter              `json:"counters"`
+	ArticleId               string            `json:"articleId"`
+	Tags                    []string          `json:"tags"`
+	SuspensionQuota         int               `json:"suspensionQuota"`
+	Warranties              []Warranty        `json:"warranties"`
+	WarrantyInfo            any               `json:"warrantyInfo"`
+	WarrantyState           string            `json:"warrantyState"`
+	ClubId                  string            `json:"clubId"`
+	NoticePeriod            *string           `json:"noticePeriod"`
+	FixedPeriod             bool              `json:"fixedPeriod"`
+	EngagementRenewal       EngagementRenewal `json:"engagementRenewal"`
+	StatisticsDisabled      bool              `json:"statisticsDisabled"`
+	ServiceProperty         ServiceProperty   `json:"serviceProperty"`
+	InitialInfo             InitialInfo       `json:"initialInfo"`
+	Payments                []Payment         `json:"payments"`
+	OfferName               string            `json:"offerName"`
+	ProductionCode          string            `json:"productionCode"`
+	ProductName             *string           `json:"productName"`
+	BillingRhythm           string            `json:"billingRhythm"`
+	RhythmBilling           string            `json:"rhythmBilling"`
+	ProductDescription      string            `json:"productDescription"`
+	IsOldComputedSchedule   bool              `json:"isOldComputedSchedule"`
+	SharedResource          SharedResource    `json:"sharedResource"`
+	AutoRenewal             bool              `json:"autoRenewal"`
+	RenewalExpiredAt        string            `json:"renewalExpiredAt"`
+	RenewalInfo             []RenewalInfo     `json:"renewalInfo"`
+	NextRenewalDate         string            `json:"nextRenewalDate"`
+	RenewalContact          Contact           `json:"renewalContact"`
+	InclusiveValidThrough   string            `json:"inclusiveValidThrough"`
+	InclusiveEngagedThrough string            `json:"inclusiveEngagedThrough"`
+	InclusiveEndDate        string            `json:"inclusiveEndDate"`
+	RenewalType             string            `json:"renewalType"`
+	PaymentInfo             []PaymentInfoItem `json:"paymentInfo"`
+	RegularDebitDay         int               `json:"regularDebitDay"`
+	Family                  string            `json:"family"`
+	Properties              map[string]any    `json:"properties"`
+	CounterLineAutoRenewal  any               `json:"counterLineAutoRenewal"`
+	CurrentDate             int               `json:"currentDate"`
+	Counters                []Counter         `json:"counters"`
 }
 
 // Warranty representa una garantía
 type Warranty struct {
-	// Define fields if known, otherwise use interface{}
+	// Define fields if known, otherwise use any
 }
 
 // WarrantyInfo representa la información de garantía
@@ -215,31 +215,31 @@ type EngagementRenewal struct {
 
 // ServiceProperty representa la propiedad del servicio
 type ServiceProperty struct {
-	Service    string                 `json:"service"`
-	Properties map[string]interface{} `json:"properties"`
+	Service    string         `json:"service"`
+	Properties map[string]any `json:"properties"`
 }
 
 // SharedResource representa el recurso compartido
 type SharedResource struct {
-	Subscription       *XPlorSubscription     `json:"subscription"`
-	SubscriptionOption *SubscriptionOption    `json:"subscriptionOption"`
-	ValidFrom          string                 `json:"validFrom"`
-	TerminatedAt       string                 `json:"terminatedAt"`
-	EngagedThrough     string                 `json:"engagedThrough"`
-	Name               string                 `json:"name"`
-	AutoRenewal        bool                   `json:"autoRenewal"`
-	RenewalExpiredAt   string                 `json:"renewalExpiredAt"`
-	RenewalInfo        []RenewalInfo          `json:"renewalInfo"`
-	NextRenewalDate    string                 `json:"nextRenewalDate"`
-	RenewalContact     Contact                `json:"renewalContact"`
-	InitialInfo        InitialInfo            `json:"initialInfo"`
-	ValidThrough       string                 `json:"validThrough"`
-	InclusiveEndDate   string                 `json:"inclusiveEndDate"`
-	SpecialOption      bool                   `json:"specialOption"`
-	PaymentInfo        []PaymentInfoItem      `json:"paymentInfo"`
-	RegularDebitDay    int                    `json:"regularDebitDay"`
-	Family             string                 `json:"family"`
-	Properties         map[string]interface{} `json:"properties"`
+	Subscription       *XPlorSubscription  `json:"subscription"`
+	SubscriptionOption *SubscriptionOption `json:"subscriptionOption"`
+	ValidFrom          string              `json:"validFrom"`
+	TerminatedAt       string              `json:"terminatedAt"`
+	EngagedThrough     string              `json:"engagedThrough"`
+	Name               string              `json:"name"`
+	AutoRenewal        bool                `json:"autoRenewal"`
+	RenewalExpiredAt   string              `json:"renewalExpiredAt"`
+	RenewalInfo        []RenewalInfo       `json:"renewalInfo"`
+	NextRenewalDate    string              `json:"nextRenewalDate"`
+	RenewalContact     Contact             `json:"renewalContact"`
+	InitialInfo        InitialInfo         `json:"initialInfo"`
+	ValidThrough       string              `json:"validThrough"`
+	InclusiveEndDate   string              `json:"inclusiveEndDate"`
+	SpecialOption      bool                `json:"specialOption"`
+	PaymentInfo        []PaymentInfoItem   `json:"paymentInfo"`
+	RegularDebitDay    int                 `json:"regularDebitDay"`
+	Family             string              `json:"family"`
+	Properties         map[string]any      `json:"properties"`
 }
 
 // PaymentInfoItem representa un elemento de información de pago

@@ -27,8 +27,8 @@ type XPlorArticle struct {
 	ProductCode               string            `json:"productCode"`
 	ProductType               string            `json:"productType"`
 	OfferName                 string            `json:"offerName"`
-	RegistrationFeeCode       interface{}       `json:"registrationFeeCode"`
-	RegistrationFeeName       interface{}       `json:"registrationFeeName"`
+	RegistrationFeeCode       any               `json:"registrationFeeCode"`
+	RegistrationFeeName       any               `json:"registrationFeeName"`
 	PriceTE                   float64           `json:"priceTE"`
 	PriceTI                   float64           `json:"priceTI"`
 	ProratedPriceTI           float64           `json:"proratedPriceTI"`
@@ -39,11 +39,11 @@ type XPlorArticle struct {
 	PriceCurrency             string            `json:"priceCurrency"`
 	TaxRate                   float64           `json:"taxRate"`
 	ArticleBehaviors          []ArticleBehavior `json:"articleBehaviors"`
-	Parent                    interface{}       `json:"parent"`
+	Parent                    any               `json:"parent"`
 	CreatedAt                 *util.LocalTime   `json:"createdAt"`
 	CreatedBy                 string            `json:"createdBy"`
 	DeletedAt                 *util.LocalTime   `json:"deletedAt"`
-	DeletedBy                 interface{}       `json:"deletedBy"`
+	DeletedBy                 any               `json:"deletedBy"`
 	RepaymentSchedule         RepaymentSchedule `json:"repaymentSchedule"`
 	ProductID                 *string           `json:"productId"`
 	OfferID                   *string           `json:"offerId"`
@@ -52,8 +52,8 @@ type XPlorArticle struct {
 	Mandatory                 bool              `json:"mandatory"`
 	RegistrationFeeDiscount   bool              `json:"registrationFeeDiscount"`
 	ContractID                *string           `json:"contractId"`
-	PackageID                 interface{}       `json:"packageId"`
-	PackageName               interface{}       `json:"packageName"`
+	PackageID                 any               `json:"packageId"`
+	PackageName               any               `json:"packageName"`
 	PriceDiscountTI           float64           `json:"priceDiscountTI"`
 	PriceDiscountTE           float64           `json:"priceDiscountTE"`
 	RegistrationFeeDiscountTI float64           `json:"registrationFeeDiscountTI"`
@@ -67,20 +67,20 @@ type XPlorArticle struct {
 	ContactGivenName          string            `json:"contactGivenName"`
 	ContactNumber             string            `json:"contactNumber"`
 	HasImplementationErrors   bool              `json:"hasImplementationErrors"`
-	ImplementationErrors      []interface{}     `json:"implementationErrors"`
+	ImplementationErrors      any               `json:"implementationErrors"`
 	ContactID                 *string           `json:"contactId"`
 	RenewalType               string            `json:"renewalType"`
 }
 
 type ArticleBehavior struct {
-	ID                  *string     `json:"@id"`
-	Type                string      `json:"@type"`
-	BehaviorID          *string     `json:"behaviorId"`
-	Configuration       interface{} `json:"configuration"`
-	Implementation      interface{} `json:"implementation"`
-	ImplementationError interface{} `json:"implementationError"`
-	Result              interface{} `json:"result"`
-	PackageElementID    interface{} `json:"packageElementId"`
+	ID                  *string `json:"@id"`
+	Type                string  `json:"@type"`
+	BehaviorID          *string `json:"behaviorId"`
+	Configuration       any     `json:"configuration"`
+	Implementation      any     `json:"implementation"`
+	ImplementationError any     `json:"implementationError"`
+	Result              any     `json:"result"`
+	PackageElementID    any     `json:"packageElementId"`
 }
 
 type RepaymentSchedule struct {
