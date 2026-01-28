@@ -113,9 +113,9 @@ func (f XPlorFamily) Parents() []familyMember {
 	return parents
 }
 
-// ObtainParentsSecundary returns secondary parents based on age (>= 18) or owner status
+// ParentsSecundary returns secondary parents based on age (>= 18) or owner status
 // Includes non-responsible members who are either adults or have owner=true in their FamilyLinkResources
-func (f XPlorFamily) ObtainParentsSecundary() []familyMember {
+func (f XPlorFamily) ParentsSecundary() []familyMember {
 	var secondaryParents []familyMember
 
 	for _, m := range f.Members {
@@ -158,6 +158,38 @@ func (f XPlorFamily) Children() []familyMember {
 		}
 	}
 	return children
+}
+
+// ChildrenSecundary returns secondary children based on age (< 18) and not responsible
+// Includes non-responsible members who are minors and do not have owner status in FamilyLinkResources
+func (f XPlorFamily) ChildrenSecundary() []familyMember {
+	var secondaryChildren []familyMember
+
+	for _, m := range f.Members {
+		// No incluir responsables primarios
+		if m.Responsible {
+			continue
+		}
+
+		// No incluir si tiene familyLinkResource con owner=true
+		hasOwnerLink := false
+		for _, link := range m.FamilyLinkResources {
+			if link.Owner {
+				hasOwnerLink = true
+				break
+			}
+		}
+		if hasOwnerLink {
+			continue
+		}
+
+		// Verificar si es menor de edad
+		if age := m.Age(); age != nil && *age < 18 {
+			secondaryChildren = append(secondaryChildren, m)
+		}
+	}
+
+	return secondaryChildren
 }
 
 // MemberNames returns all member full names (useful for debugging or listing)
