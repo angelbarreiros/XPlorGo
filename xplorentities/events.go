@@ -87,7 +87,19 @@ func (hv HydraView) FirstPageNumber() (int, error) {
 // LastPageNumber extracts the page number from the last URL
 func (hv HydraView) LastPageNumber() (int, error) {
 	if hv.HydraLast == "" {
-		return 1, nil // Return 1 if there's no last page (only one page available)
+		// If there's no last page, try to use next page number
+		if hv.HydraNext != "" {
+			pageStr, err := extractPageNumber(hv.HydraNext)
+			if err != nil {
+				return 1, nil // Return 1 if we can't extract page number
+			}
+			pageInt, err := strconv.Atoi(pageStr)
+			if err != nil {
+				return 1, nil // Return 1 if page parameter is not a valid integer
+			}
+			return pageInt, nil
+		}
+		return 1, nil // Return 1 if there's no last page and no next page
 	}
 	pageStr, err := extractPageNumber(hv.HydraLast)
 	if err != nil {

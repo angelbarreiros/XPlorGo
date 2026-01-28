@@ -236,7 +236,7 @@ func (p XPlorClassesParams) ToValues(orgName string, values *url.Values) {
 		values.Add("studio[]", studio)
 	}
 	for _, recurrence := range p.Recurrences {
-		values.Add("recurrence[]", "/"+orgName+"/recurrences/"+recurrence)
+		values.Add("recurrence[]", recurrence)
 	}
 	for _, contactID := range p.AttendeeContactIDs {
 		values.Add("attendees.contactId[]", contactID)
