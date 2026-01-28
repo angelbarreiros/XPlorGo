@@ -2,7 +2,7 @@
 
 ## Descripción General
 
-**XPlorGo** es un SDK en **Go** para interactuar con la **API XPlor** de Stadline. Proporciona una interfaz completa para gestionar recursos de un sistema de gestión de eventos, actividades, clases y usuarios en clubes deportivos.
+**XPlorGo** es un SDK en **Go** para interactuar con la **API XPlor** de Resamanía. Proporciona una interfaz incompleta para gestionar recursos de un sistema de gestión de eventos, actividades, clases y usuarios en clubes deportivos.
 
 ---
 
