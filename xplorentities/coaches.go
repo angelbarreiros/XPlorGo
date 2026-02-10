@@ -25,7 +25,7 @@ type XPloreCoach struct {
 	Activities    []*string       `json:"activities"`
 	CreatedAt     *util.LocalTime `json:"createdAt"`
 	CreatedBy     *string         `json:"createdBy"`
-	ArchivedAt    *string         `json:"archivedAt"`
+	ArchivedAt    *util.LocalTime `json:"archivedAt"`
 	ArchivedBy    *string         `json:"archivedBy"`
 }
 
@@ -45,4 +45,7 @@ func (c XPloreCoach) ActivityIDs() []string {
 // CoachID extracts the coach ID from the @id field
 func (c XPloreCoach) CoachID() (string, error) {
 	return ExtractID(c.Id, "coach ID field is nil")
+}
+func (c XPloreCoach) IsActive() bool {
+	return c.ArchivedAt == nil
 }
