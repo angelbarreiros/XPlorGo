@@ -124,6 +124,7 @@ func (xe *XplorProvider) generateClubIdIfNeeded(executor *xplorExecutor, nodeId 
 				return err
 			}
 			var id, cErr = node.ClubIDValue()
+
 			if cErr != nil {
 				return &xplorentities.ErrorResponse{
 					Code:    404,

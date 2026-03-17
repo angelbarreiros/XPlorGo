@@ -17,9 +17,44 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-// LocalTime maneja fechas en formato "2006-01-02T15:04:05" sin zona horaria
+// LocalTime handles API datetime values and normalizes them to UTC.
+// Convention used by this SDK:
+// - RFC3339 values (with timezone) keep their absolute instant.
+// - Naive values (without timezone) are assumed to come in UTC+1.
 type LocalTime struct {
 	time.Time
+}
+
+// assumedSourceLocation defines the source timezone for naive timestamps.
+var assumedSourceLocation = time.FixedZone("UTC+1", 1*60*60)
+
+// parseTimeAsUTC parses API date/datetime strings and always returns UTC.
+func parseTimeAsUTC(s string, dateTimeLayouts []string, dateLayouts []string) (time.Time, error) {
+	// If payload includes timezone info, keep that absolute instant and normalize to UTC.
+	if t, err := time.Parse(time.RFC3339, s); err == nil {
+		return t.UTC(), nil
+	}
+
+	var lastErr error
+	for _, layout := range dateTimeLayouts {
+		// Naive datetime is interpreted in UTC+1 before UTC normalization.
+		t, err := time.ParseInLocation(layout, s, assumedSourceLocation)
+		if err == nil {
+			return t.UTC(), nil
+		}
+		lastErr = err
+	}
+
+	for _, layout := range dateLayouts {
+		// Naive date is interpreted at 00:00:00 in UTC+1, then converted to UTC.
+		t, err := time.ParseInLocation(layout, s, assumedSourceLocation)
+		if err == nil {
+			return t.UTC(), nil
+		}
+		lastErr = err
+	}
+
+	return time.Time{}, lastErr
 }
 
 func (lt *LocalTime) UnmarshalJSON(b []byte) error {
@@ -27,8 +62,12 @@ func (lt *LocalTime) UnmarshalJSON(b []byte) error {
 	if s == "" {
 		return nil
 	}
-	// Ajusta el layout al formato recibido por el API
-	t, err := time.Parse("2006-01-02T15:04:05", s)
+	// Parse and normalize to UTC to keep SDK timestamps consistent in storage.
+	t, err := parseTimeAsUTC(
+		s,
+		[]string{"2006-01-02T15:04:05", "2006-01-02 15:04:05"},
+		nil,
+	)
 	if err != nil {
 		return err
 	}
@@ -37,10 +76,12 @@ func (lt *LocalTime) UnmarshalJSON(b []byte) error {
 }
 
 func (lt LocalTime) MarshalJSON() ([]byte, error) {
+	// Keep API-compatible datetime format without timezone suffix.
 	return json.Marshal(lt.Format("2006-01-02T15:04:05"))
 }
 
-// LocalDate maneja fechas en formato "2006-01-02" sin zona horaria ni hora
+// LocalDate handles API date values and normalizes them to UTC.
+// Naive inputs are assumed to be in UTC+1.
 type LocalDate struct {
 	time.Time
 }
@@ -50,20 +91,20 @@ func (ld *LocalDate) UnmarshalJSON(b []byte) error {
 	if s == "" {
 		return nil
 	}
-	// Intenta parsear primero formato completo con hora
-	if t, err := time.Parse("2006-01-02T15:04:05", s); err == nil {
-		ld.Time = t
-		return nil
+	t, err := parseTimeAsUTC(
+		s,
+		[]string{"2006-01-02T15:04:05", "2006-01-02 15:04:05"},
+		[]string{"2006-01-02"},
+	)
+	if err != nil {
+		return fmt.Errorf("unable to parse date: %s", s)
 	}
-	// Si falla, intenta parsear solo fecha
-	if t, err := time.Parse("2006-01-02", s); err == nil {
-		ld.Time = t
-		return nil
-	}
-	return fmt.Errorf("unable to parse date: %s", s)
+	ld.Time = t
+	return nil
 }
 
 func (ld LocalDate) MarshalJSON() ([]byte, error) {
+	// Keep API-compatible date format.
 	return json.Marshal(ld.Format("2006-01-02"))
 }
 
