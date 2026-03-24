@@ -94,24 +94,24 @@ func (c XPlorClass) RecurrenceID() (string, error) {
 
 // Métodos de utilidad para fechas
 
-// GetStartedAt returns the start time normalized to UTC.
+// GetStartedAt returns the start time as a naive timestamp.
 func (c XPlorClass) GetStartedAt() time.Time {
-	return c.StartedAt.Time.UTC()
+	return c.StartedAt.Time
 }
 
-// GetEndedAt returns the end time normalized to UTC.
+// GetEndedAt returns the end time as a naive timestamp.
 func (c XPlorClass) GetEndedAt() time.Time {
-	return c.EndedAt.Time.UTC()
+	return c.EndedAt.Time
 }
 
-// GetCreatedAt returns the creation time normalized to UTC.
+// GetCreatedAt returns the creation time as a naive timestamp.
 func (c XPlorClass) GetCreatedAt() time.Time {
-	return c.CreatedAt.Time.UTC()
+	return c.CreatedAt.Time
 }
 
-// GetUpdatedAt returns the last update time normalized to UTC.
+// GetUpdatedAt returns the last update time as a naive timestamp.
 func (c XPlorClass) GetUpdatedAt() time.Time {
-	return c.UpdatedAt.Time.UTC()
+	return c.UpdatedAt.Time
 }
 
 // Métodos para verificar disponibilidad

@@ -17,39 +17,38 @@ type ErrorResponse struct {
 	Message string `json:"message"`
 }
 
-// LocalTime handles API datetime values and normalizes them to UTC.
-// Convention used by this SDK:
-// - RFC3339 values (with timezone) keep their absolute instant.
-// - Naive values (without timezone) are assumed to come in UTC+1.
+// LocalTime handles API datetime values as naive timestamps (without timezone).
+// All timestamps are returned as-is from the API, allowing timezone handling
+// to be managed at the application level.
 type LocalTime struct {
 	time.Time
 }
 
-// assumedSourceLocation defines the source timezone for naive timestamps.
-var assumedSourceLocation = time.FixedZone("UTC+1", 1*60*60)
-
-// parseTimeAsUTC parses API date/datetime strings and always returns UTC.
-func parseTimeAsUTC(s string, dateTimeLayouts []string, dateLayouts []string) (time.Time, error) {
-	// If payload includes timezone info, keep that absolute instant and normalize to UTC.
+// parseTimeAsNaive parses API date/datetime strings and returns naive timestamps.
+// RFC3339 values with timezone info have the timezone stripped, keeping only the date/time components.
+// Naive values are parsed directly without timezone assumptions.
+func parseTimeAsNaive(s string, dateTimeLayouts []string, dateLayouts []string) (time.Time, error) {
+	// If payload includes timezone info (RFC3339), strip it and use only date/time components
 	if t, err := time.Parse(time.RFC3339, s); err == nil {
-		return t.UTC(), nil
+		// Return as naive: extract the date/time components without timezone
+		return time.Date(t.Year(), t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), 0, time.UTC), nil
 	}
 
 	var lastErr error
 	for _, layout := range dateTimeLayouts {
-		// Naive datetime is interpreted in UTC+1 before UTC normalization.
-		t, err := time.ParseInLocation(layout, s, assumedSourceLocation)
+		// Parse naive datetime directly in UTC location (no conversion)
+		t, err := time.Parse(layout, s)
 		if err == nil {
-			return t.UTC(), nil
+			return t, nil
 		}
 		lastErr = err
 	}
 
 	for _, layout := range dateLayouts {
-		// Naive date is interpreted at 00:00:00 in UTC+1, then converted to UTC.
-		t, err := time.ParseInLocation(layout, s, assumedSourceLocation)
+		// Parse naive date directly in UTC location (no conversion)
+		t, err := time.Parse(layout, s)
 		if err == nil {
-			return t.UTC(), nil
+			return t, nil
 		}
 		lastErr = err
 	}
@@ -62,8 +61,8 @@ func (lt *LocalTime) UnmarshalJSON(b []byte) error {
 	if s == "" {
 		return nil
 	}
-	// Parse and normalize to UTC to keep SDK timestamps consistent in storage.
-	t, err := parseTimeAsUTC(
+	// Parse as naive timestamp without timezone conversion
+	t, err := parseTimeAsNaive(
 		s,
 		[]string{"2006-01-02T15:04:05", "2006-01-02 15:04:05"},
 		nil,
@@ -91,7 +90,7 @@ func (ld *LocalDate) UnmarshalJSON(b []byte) error {
 	if s == "" {
 		return nil
 	}
-	t, err := parseTimeAsUTC(
+	t, err := parseTimeAsNaive(
 		s,
 		[]string{"2006-01-02T15:04:05", "2006-01-02 15:04:05"},
 		[]string{"2006-01-02"},
