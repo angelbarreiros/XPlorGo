@@ -382,6 +382,54 @@ func (xd *XplorProvider) Contact(nodeId string, contactId string) (*xplorentitie
 	return contact, nil
 
 }
+func (xd *XplorProvider) ContactImages(nodeId string, params *xplorentities.XPlorContactImagesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactImages, *xplorentities.ErrorResponse) {
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
+		return nil, err
+	}
+	defer xd.putExecutor(executor)
+
+	contactImages, err := executor.contactImages(xd.token.Token.AccessToken, params, pagination)
+	if err != nil {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    err.Code,
+			Message: "Failed to get contact images: " + err.Message,
+		}
+	}
+
+	return contactImages, nil
+}
+func (xd *XplorProvider) ContactImage(nodeId string, contactImageId string) (*xplorentities.XPlorContactImage, *xplorentities.ErrorResponse) {
+	contactImageId = strings.TrimSpace(contactImageId)
+	if contactImageId == "" {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Contact Image ID is required",
+		}
+	}
+	contactImageId, extractErr := xplorentities.ExtractID(&contactImageId, "contact image ID field is nil")
+	if extractErr != nil {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: "Invalid Contact Image ID: " + extractErr.Error(),
+		}
+	}
+	executor, err := xd.getExecutorFullyInitialized(nodeId)
+	if err != nil {
+		return nil, err
+	}
+	defer xd.putExecutor(executor)
+
+	contactImage, err := executor.contactImage(xd.token.Token.AccessToken, contactImageId)
+	if err != nil {
+		return nil, &xplorentities.ErrorResponse{
+			Code:    err.Code,
+			Message: "Failed to get contact image: " + err.Message,
+		}
+	}
+
+	return contactImage, nil
+}
 func (xe *XplorProvider) Subscriptions(nodeId string, params *xplorentities.XPlorSubscriptionsParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorSubscriptions, *xplorentities.ErrorResponse) {
 	executor, err := xe.getExecutorFullyInitialized(nodeId)
 	if err != nil {

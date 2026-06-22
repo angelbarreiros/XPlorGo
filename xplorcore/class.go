@@ -23,7 +23,7 @@ func (xe xplorExecutor) classes(accesToken string, queryParams *xplorentities.XP
 
 		var request = xe.config.generateRequest(http.MethodGet, "/class_events", xe.generateHeaders(accesToken), paginatedParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorClasses](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorClasses](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -51,7 +51,7 @@ func (xe xplorExecutor) class(accesToken string, classId string) (*xplorentities
 
 		var request = xe.config.generateRequest(http.MethodGet, "/class_events/"+classId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorClass](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorClass](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

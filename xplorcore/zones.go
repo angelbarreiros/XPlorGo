@@ -23,7 +23,7 @@ func (xe xplorExecutor) zones(accesToken string, params *xplorentities.XPlorZone
 
 		var request = xe.config.generateRequest(http.MethodGet, "/zones", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorZones](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorZones](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -51,7 +51,7 @@ func (xe xplorExecutor) zone(accesToken string, zoneId string) (*xplorentities.X
 
 		var request = xe.config.generateRequest(http.MethodGet, "/zones/"+zoneId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorZone](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorZone](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

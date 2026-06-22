@@ -20,7 +20,7 @@ func (xe xplorExecutor) studios(accesToken string, pagination *xplorentities.XPl
 
 		var request = xe.config.generateRequest(http.MethodGet, "/studios", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorStudios](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorStudios](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -48,7 +48,7 @@ func (xe xplorExecutor) studio(accesToken string, familyId string) (*xplorentiti
 
 		var request = xe.config.generateRequest(http.MethodGet, "/studios/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorStudio](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorStudio](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

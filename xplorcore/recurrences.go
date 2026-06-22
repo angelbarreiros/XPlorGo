@@ -23,7 +23,7 @@ func (xe xplorExecutor) recurrences(accesToken string, params *xplorentities.XPl
 
 		var request = xe.config.generateRequest(http.MethodGet, "/recurrences", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorRecurrences](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorRecurrences](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -51,7 +51,7 @@ func (xe xplorExecutor) recurrence(accesToken string, familyId string) (*xploren
 
 		var request = xe.config.generateRequest(http.MethodGet, "/recurrences/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorRecurrence](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorRecurrence](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

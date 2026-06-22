@@ -20,7 +20,7 @@ func (xe xplorExecutor) clubs(accesToken string, pagination *xplorentities.XPlor
 
 		var request = xe.config.generateRequest(http.MethodGet, "/clubs", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPloreClubs](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPloreClubs](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -49,7 +49,7 @@ func (xe xplorExecutor) club(accesToken string, clubId string) (*xplorentities.X
 
 		var request = xe.config.generateRequest(http.MethodGet, "/clubs/"+clubId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorClub](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorClub](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

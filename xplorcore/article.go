@@ -20,7 +20,7 @@ func (xe xplorExecutor) articles(accesToken string, pagination *xplorentities.XP
 
 		var request = xe.config.generateRequest(http.MethodGet, "/articles", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorArticles](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorArticles](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -48,7 +48,7 @@ func (xe xplorExecutor) article(accesToken string, articleId string) (*xplorenti
 
 		var request = xe.config.generateRequest(http.MethodGet, "/articles/"+articleId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorArticle](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorArticle](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

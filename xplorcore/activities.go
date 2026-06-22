@@ -23,7 +23,7 @@ func (xe xplorExecutor) activities(accesToken string, queryParams *xplorentities
 
 		var request = xe.config.generateRequest(http.MethodGet, "/activities", xe.generateHeaders(accesToken), paginatedParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorActivities](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorActivities](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -53,7 +53,7 @@ func (xe xplorExecutor) activity(accesToken string, activityId string) (*xploren
 
 		var request = xe.config.generateRequest(http.MethodGet, "/activities/"+activityId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorActivity](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorActivity](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

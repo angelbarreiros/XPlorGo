@@ -23,7 +23,7 @@ func (xe xplorExecutor) families(accesToken string, params *xplorentities.XPlorF
 
 		var request = xe.config.generateRequest(http.MethodGet, "/families", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorFamilies](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorFamilies](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -51,7 +51,7 @@ func (xe xplorExecutor) family(accesToken string, familyId string) (*xplorentiti
 
 		var request = xe.config.generateRequest(http.MethodGet, "/families/"+familyId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorFamily](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorFamily](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

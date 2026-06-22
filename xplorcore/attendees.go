@@ -21,7 +21,7 @@ func (xe xplorExecutor) attendees(accesToken string, classId *string, pagination
 
 		var request = xe.config.generateRequest(http.MethodGet, "/attendees", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorAttendees](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorAttendees](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

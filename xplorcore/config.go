@@ -19,15 +19,17 @@ type xplorConfig struct {
 	ClientID       string
 	ClientSecret   string
 	NeededHeaders  []neededHeaders
+	Debug          bool
 }
 
-func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string) *xplorConfig {
+func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string, debug bool) *xplorConfig {
 	var config = &xplorConfig{
 		Host:           host,
 		APIVersion:     apiVersion,
 		EnterpriseName: enterpriseName,
 		ClientID:       clientID,
 		ClientSecret:   clientSecret,
+		Debug:          debug,
 	}
 	for headerName, value := range headers {
 		config.NeededHeaders = append(config.NeededHeaders, neededHeaders{

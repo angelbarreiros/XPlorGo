@@ -9,18 +9,21 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-func (xe xplorExecutor) coaches(accesToken string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPloreCoaches, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) contactImages(accesToken string, params *xplorentities.XPlorContactImagesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorContactImages, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
-	resultChan := make(chan util.RequestResult[*xplorentities.XPloreCoaches], 1)
+	resultChan := make(chan util.RequestResult[*xplorentities.XPlorContactImages], 1)
 
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
+		if params != nil {
+			params.ToValues(&queryParams)
+		}
 		formData := url.Values{}
 
-		var request = xe.config.generateRequest(http.MethodGet, "/coaches", xe.generateHeaders(accesToken), queryParams, formData)
+		var request = xe.config.generateRequest(http.MethodGet, "/files/contact_images", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPloreCoaches](ctxWithTimeout, xe.client, request, xe.config.Debug)
+		result := util.ExecuteRequest[*xplorentities.XPlorContactImages](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -36,19 +39,19 @@ func (xe xplorExecutor) coaches(accesToken string, pagination *xplorentities.XPl
 			Message: "Request timeout: operation cancelled after 10 seconds",
 		}
 	}
-
 }
-func (xe xplorExecutor) coach(accesToken string, familyId string) (*xplorentities.XPloreCoach, *xplorentities.ErrorResponse) {
+
+func (xe xplorExecutor) contactImage(accesToken string, contactImageId string) (*xplorentities.XPlorContactImage, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
-	resultChan := make(chan util.RequestResult[*xplorentities.XPloreCoach], 1)
+	resultChan := make(chan util.RequestResult[*xplorentities.XPlorContactImage], 1)
 
 	go func() {
 		formData := url.Values{}
 
-		var request = xe.config.generateRequest(http.MethodGet, "/coaches/"+familyId, xe.generateHeaders(accesToken), nil, formData)
+		var request = xe.config.generateRequest(http.MethodGet, "/files/contact_images/"+contactImageId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPloreCoach](ctxWithTimeout, xe.client, request, xe.config.Debug)
+		result := util.ExecuteRequest[*xplorentities.XPlorContactImage](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -64,5 +67,4 @@ func (xe xplorExecutor) coach(accesToken string, familyId string) (*xplorentitie
 			Message: "Request timeout: operation cancelled after 10 seconds",
 		}
 	}
-
 }

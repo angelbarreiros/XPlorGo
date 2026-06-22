@@ -26,7 +26,7 @@ func (xe xplorExecutor) authenticate() (*xplorentities.XPlorTokenResponse, *xplo
 
 		var request = xe.config.generateRequest(http.MethodPost, "/oauth/v2/token", header, nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorTokenResponse](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorTokenResponse](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

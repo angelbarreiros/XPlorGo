@@ -23,7 +23,7 @@ func (xe xplorExecutor) subscriptions(accesToken string, params *xplorentities.X
 
 		var request = xe.config.generateRequest(http.MethodGet, "/subscriptions", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorSubscriptions](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorSubscriptions](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
@@ -51,7 +51,7 @@ func (xe xplorExecutor) subscription(accesToken string, subscriptionId string) (
 
 		var request = xe.config.generateRequest(http.MethodGet, "/subscriptions/"+subscriptionId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorSubscription](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorSubscription](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

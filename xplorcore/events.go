@@ -20,7 +20,7 @@ func (xe xplorExecutor) events(accesToken string, pagination *xplorentities.XPlo
 
 		var request = xe.config.generateRequest(http.MethodGet, "/events", xe.generateHeaders(accesToken), queryParams, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorEvents](ctxWithTimeout, xe.client, request)
+		result := util.ExecuteRequest[*xplorentities.XPlorEvents](ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()
