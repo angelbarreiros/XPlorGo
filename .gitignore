@@ -6,3 +6,6 @@ ia
 *.md
 *.txt
 dsadsa.txt
+scripts/
+.codex/
+.agents/

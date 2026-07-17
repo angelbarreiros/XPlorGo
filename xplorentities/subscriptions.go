@@ -36,17 +36,17 @@ type XPlorSubscription struct {
 	Consumed                bool                 `json:"consumed"`
 	SubscriptionOptions     []SubscriptionOption `json:"subscriptionOptions"`
 	ArticleId               string               `json:"articleId"`
-	Tags                    [][]string           `json:"tags"`
+	Tags                    []string             `json:"tags"`
 	SuspensionQuota         int                  `json:"suspensionQuota"`
 	Warranties              []Warranty           `json:"warranties"`
-	WarrantyInfo            *WarrantyInfo        `json:"warrantyInfo"`
+	WarrantyInfo            any                  `json:"warrantyInfo"`
 	WarrantyState           string               `json:"warrantyState"`
 	ClubId                  string               `json:"clubId"`
 	NoticePeriod            *string              `json:"noticePeriod"`
 	FixedPeriod             bool                 `json:"fixedPeriod"`
 	EngagementRenewal       EngagementRenewal    `json:"engagementRenewal"`
 	StatisticsDisabled      bool                 `json:"statisticsDisabled"`
-	ServiceProperty         string               `json:"serviceProperty"`
+	ServiceProperty         any                  `json:"serviceProperty"`
 	InitialInfo             InitialInfo          `json:"initialInfo"`
 	SharedResource          string               `json:"sharedResource"`
 	AutoRenewal             bool                 `json:"autoRenewal"`
@@ -54,12 +54,12 @@ type XPlorSubscription struct {
 	RenewalInfo             []RenewalInfo        `json:"renewalInfo"`
 	NextRenewalDate         string               `json:"nextRenewalDate"`
 	RenewalContact          Contact              `json:"renewalContact"`
-	CounterLineAutoRenewal  map[string]any       `json:"counterLineAutoRenewal"`
+	CounterLineAutoRenewal  any                  `json:"counterLineAutoRenewal"`
 	InclusiveValidThrough   string               `json:"inclusiveValidThrough"`
 	InclusiveEngagedThrough string               `json:"inclusiveEngagedThrough"`
 	InclusiveEndDate        string               `json:"inclusiveEndDate"`
 	RenewalType             string               `json:"renewalType"`
-	PaymentInfo             []PaymentInfoItem    `json:"paymentInfo"`
+	PaymentInfo             *PaymentInfo         `json:"paymentInfo"`
 	RegularDebitDay         int                  `json:"regularDebitDay"`
 	Family                  string               `json:"family"`
 	Properties              map[string]any       `json:"properties"`
@@ -149,17 +149,17 @@ type Payment struct {
 // SubscriptionOption representa una opción de suscripción
 type SubscriptionOption struct {
 	ArticleId               string            `json:"articleId"`
-	Tags                    [][]string        `json:"tags"`
+	Tags                    []string          `json:"tags"`
 	SuspensionQuota         int               `json:"suspensionQuota"`
 	Warranties              []Warranty        `json:"warranties"`
-	WarrantyInfo            *WarrantyInfo     `json:"warrantyInfo"`
+	WarrantyInfo            any               `json:"warrantyInfo"`
 	WarrantyState           string            `json:"warrantyState"`
 	ClubId                  string            `json:"clubId"`
 	NoticePeriod            *string           `json:"noticePeriod"`
 	FixedPeriod             bool              `json:"fixedPeriod"`
 	EngagementRenewal       EngagementRenewal `json:"engagementRenewal"`
 	StatisticsDisabled      bool              `json:"statisticsDisabled"`
-	ServiceProperty         string            `json:"serviceProperty"`
+	ServiceProperty         any               `json:"serviceProperty"`
 	InitialInfo             InitialInfo       `json:"initialInfo"`
 	SharedResource          string            `json:"sharedResource"`
 	AutoRenewal             bool              `json:"autoRenewal"`
@@ -167,12 +167,12 @@ type SubscriptionOption struct {
 	RenewalInfo             []RenewalInfo     `json:"renewalInfo"`
 	NextRenewalDate         string            `json:"nextRenewalDate"`
 	RenewalContact          Contact           `json:"renewalContact"`
-	CounterLineAutoRenewal  map[string]any    `json:"counterLineAutoRenewal"`
+	CounterLineAutoRenewal  any               `json:"counterLineAutoRenewal"`
 	InclusiveValidThrough   string            `json:"inclusiveValidThrough"`
 	InclusiveEngagedThrough string            `json:"inclusiveEngagedThrough"`
 	InclusiveEndDate        string            `json:"inclusiveEndDate"`
 	RenewalType             string            `json:"renewalType"`
-	PaymentInfo             []PaymentInfoItem `json:"paymentInfo"`
+	PaymentInfo             *PaymentInfo      `json:"paymentInfo"`
 	RegularDebitDay         int               `json:"regularDebitDay"`
 	Family                  string            `json:"family"`
 	Properties              map[string]any    `json:"properties"`
@@ -198,18 +198,19 @@ type PaymentReference struct {
 	Id *string `json:"@id,omitempty"`
 }
 
-// PaymentInfoItem representa un elemento de información de pago (actualmente vacío según la API)
+// PaymentInfoItem is kept for source compatibility with older SDK consumers.
+// Xplor currently returns paymentInfo as a PaymentInfo object.
 type PaymentInfoItem struct{}
 
 // Counter representa un contador
 type Counter struct {
-	ArticleId               string            `json:"articleId"`
-	InclusiveValidThrough   string            `json:"inclusiveValidThrough"`
-	InclusiveEngagedThrough string            `json:"inclusiveEngagedThrough"`
-	InclusiveEndDate        string            `json:"inclusiveEndDate"`
-	RenewalType             string            `json:"renewalType"`
-	PaymentInfo             []PaymentInfoItem `json:"paymentInfo"`
-	RegularDebitDay         int               `json:"regularDebitDay"`
+	ArticleId               string       `json:"articleId"`
+	InclusiveValidThrough   string       `json:"inclusiveValidThrough"`
+	InclusiveEngagedThrough string       `json:"inclusiveEngagedThrough"`
+	InclusiveEndDate        string       `json:"inclusiveEndDate"`
+	RenewalType             string       `json:"renewalType"`
+	PaymentInfo             *PaymentInfo `json:"paymentInfo"`
+	RegularDebitDay         int          `json:"regularDebitDay"`
 }
 
 type XPlorSubscriptionsParams struct {
