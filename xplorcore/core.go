@@ -40,15 +40,20 @@ func NewProvider(cfg *xplorConfig) *XplorProvider {
 }
 
 func newProvider(cfg *xplorConfig) *XplorProvider {
-	return &XplorProvider{
+	provider := &XplorProvider{
 		authMutex:        &sync.Mutex{},
 		nodeClubRelation: make(map[string]string),
-		providers: &sync.Pool{
-			New: func() any {
-				return &xplorExecutor{config: cfg, client: http.DefaultClient, defaultTimeout: 30 * time.Second}
-			},
+	}
+	provider.providers = &sync.Pool{
+		New: func() any {
+			return &xplorExecutor{
+				config:         cfg,
+				client:         newXplorHTTPClient(provider),
+				defaultTimeout: 30 * time.Second,
+			}
 		},
 	}
+	return provider
 }
 func checkNodeId(nodeId string) *xplorentities.ErrorResponse {
 	if strings.TrimSpace(nodeId) == "" {

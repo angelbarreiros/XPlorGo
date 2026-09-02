@@ -54,7 +54,12 @@ func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeader
 		Header: make(http.Header),
 	}
 	if params != nil {
-		request.Body = io.NopCloser(bytes.NewBufferString(params.Encode()))
+		body := []byte(params.Encode())
+		request.Body = io.NopCloser(bytes.NewReader(body))
+		request.GetBody = func() (io.ReadCloser, error) {
+			return io.NopCloser(bytes.NewReader(body)), nil
+		}
+		request.ContentLength = int64(len(body))
 	}
 
 	for _, header := range xc.NeededHeaders {
