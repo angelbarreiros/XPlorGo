@@ -51,6 +51,15 @@ Useful methods:
 - InitialSalepersonIDValue() -> string
 ```
 
+Contact profile images are retrieved from the contact's `PictureID` (or
+`ContactPictureID` on an attendee). `ContactImage` returns the raw image bytes
+from `/files/contact_images/{pictureId}`; the endpoint does not accept a
+`contact` query parameter.
+
+```go
+imageBytes, err := provider.ContactImage(nodeId, pictureID)
+```
+
 **Search parameters:**
 ```
 XPlorContactsParams:
@@ -380,6 +389,10 @@ Subscriptions(nodeId string, params *XPlorSubscriptionsParams,
 Subscription(nodeId string, subscriptionId string) -> (*XPlorSubscription, error)
 ```
 
+Use `XPlorSubscriptionsParams.ContactId` or `ContactIds` to restrict the
+collection request to one or more contacts. These are serialized as
+`contact`/`contact[]` and are emitted before pagination parameters.
+
 ### User Management
 ```go
 Users(pagination *XPlorPagination) -> (*XPlorUsers, error)
@@ -418,6 +431,11 @@ Recurrences(nodeId string, params *XPlorRecurrencesParams,
 Recurrence(nodeId string, recurrenceId string) -> (*XPlorRecurrence, error)
 ```
 
+For recurrence collections, `XPlorRecurrencesParams.ClubId` and `ClubIds` are
+optional explicit filters serialized as `classEventType.club` and
+`classEventType.club[]`. The network-node header alone may return recurrences
+from sibling clubs, so pass the club filter when a single center is required.
+
 ### Contact Tag Management
 ```go
 ContactTags(nodeId string, params *XPlorContactTagsParams,
@@ -432,15 +450,44 @@ ClassType(nodeId string, classTypeId string) -> (*XPlorClassType, error)
 
 ### Counter Management
 ```go
-CounterLines(nodeId string, pagination *XPlorPagination) -> (*XPlorCounterLines, error)
+CounterLines(nodeId string, params *XPlorCounterLinesParams,
+            pagination *XPlorPagination) -> (*XPlorCounterLines, error)
 CounterLine(nodeId string, counterLineId string) -> (*XPlorCounterLine, error)
 ```
 
+`XPlorCounterLinesParams.ContactID`/`ContactIDs` filter counter lines by
+contact. `ArticleID`/`ArticleIDs` and `Active` are also supported.
+
 ### Article Management
 ```go
-Articles(nodeId string, pagination *XPlorPagination) -> (*XPlorArticles, error)
+Articles(nodeId string, params *XPlorArticlesParams,
+         pagination *XPlorPagination) -> (*XPlorArticles, error)
 Article(nodeId string, articleId string) -> (*XPlorArticle, error)
 ```
+
+`XPlorArticlesParams.SaleContactID`/`SaleContactIDs` serialize to the
+API-supported `sale.contactId`/`sale.contactId[]` filters.
+
+### Contact Image Management
+```go
+ContactImages(nodeId string, params *XPlorContactImagesParams,
+             pagination *XPlorPagination) -> (*XPlorContactImages, error)
+ContactImage(nodeId string, pictureId string) -> ([]byte, error)
+```
+
+`ContactImage` returns the raw response body. Use the image ID from a contact's
+`PictureID` rather than passing a contact ID as a query filter.
+
+### Course Waiting Lists
+```go
+CourseWaitingListRecurrences(nodeId string,
+                             pagination *XPlorPagination) -> (*XPlorCourseWaitingListRecurrences, error)
+CourseWaitingListRecurrence(nodeId string, resourceId string) -> (*XPlorCourseWaitingListRecurrence, error)
+CourseWaitingList(nodeId string, resourceId string) -> (*XPlorCourseWaitingList, error)
+```
+
+The course waiting-list payloads are exposed as flexible maps because their
+schemas are not described in the public API specification.
 
 ### Zone Management
 ```go

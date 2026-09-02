@@ -9,13 +9,16 @@ import (
 	"github.com/angelbarreiros/XPlorGo/xplorentities"
 )
 
-func (xe xplorExecutor) counterLines(accesToken string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) counterLines(accesToken string, params *xplorentities.XPlorCounterLinesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
 	resultChan := make(chan util.RequestResult[*xplorentities.XPlorCounterLines], 1)
 
 	go func() {
 		var queryParams = xplorentities.BuildPaginationQueryParams(pagination)
+		if params != nil {
+			params.ToValues(&queryParams)
+		}
 		formData := url.Values{}
 
 		var request = xe.config.generateRequest(http.MethodGet, "/counter_lines", xe.generateHeaders(accesToken), queryParams, formData)

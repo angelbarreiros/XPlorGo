@@ -41,17 +41,17 @@ func (xe xplorExecutor) contactImages(accesToken string, params *xplorentities.X
 	}
 }
 
-func (xe xplorExecutor) contactImage(accesToken string, contactImageId string) (*xplorentities.XPlorContactImage, *xplorentities.ErrorResponse) {
+func (xe xplorExecutor) contactImage(accesToken string, contactImageId string) ([]byte, *xplorentities.ErrorResponse) {
 	var ctxWithTimeout, cancel = context.WithTimeout(context.Background(), xe.defaultTimeout)
 	defer cancel()
-	resultChan := make(chan util.RequestResult[*xplorentities.XPlorContactImage], 1)
+	resultChan := make(chan util.RequestResult[[]byte], 1)
 
 	go func() {
 		formData := url.Values{}
 
 		var request = xe.config.generateRequest(http.MethodGet, "/files/contact_images/"+contactImageId, xe.generateHeaders(accesToken), nil, formData)
 		request = request.WithContext(ctxWithTimeout)
-		result := util.ExecuteRequest[*xplorentities.XPlorContactImage](ctxWithTimeout, xe.client, request, xe.config.Debug)
+		result := util.ExecuteBinaryRequest(ctxWithTimeout, xe.client, request, xe.config.Debug)
 		resultChan <- result
 
 	}()

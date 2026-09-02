@@ -201,6 +201,23 @@ func (f XPlorFamily) MemberNames() []string {
 	return names
 }
 
+// ResponsibleContactIDs returns the contact IDs of the family's responsible
+// members. It exposes the relationship needed by integrations that enrich
+// parent contact records after reading the family resource.
+func (f XPlorFamily) ResponsibleContactIDs() []string {
+	ids := make([]string, 0)
+	for _, member := range f.Members {
+		if !member.Responsible || member.Contact.ID == nil {
+			continue
+		}
+		id, err := member.Contact.ContactID()
+		if err == nil {
+			ids = append(ids, id)
+		}
+	}
+	return ids
+}
+
 // MembersByState groups the family members by their contact state
 func (f XPlorFamily) MembersByState() map[string][]familyMember {
 	grouped := make(map[string][]familyMember)

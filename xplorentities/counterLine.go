@@ -2,6 +2,9 @@ package xplorentities
 
 import (
 	"errors"
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/angelbarreiros/XPlorGo/util"
@@ -9,6 +12,7 @@ import (
 
 // XPlorCounterLine representa una línea de contador individual
 type XPlorCounterLine struct {
+	ID                *string                     `json:"@id"`
 	ContactID         *string                     `json:"contactId"`
 	ContactFamilyName string                      `json:"contactFamilyName"`
 	ContactFirstName  string                      `json:"contactFirstName"`
@@ -28,6 +32,11 @@ type XPlorCounterLine struct {
 	DeletedBy         any                         `json:"deletedBy,omitempty"`
 }
 
+// CounterLineID extracts the counter-line ID from the @id field.
+func (cl *XPlorCounterLine) CounterLineID() (string, error) {
+	return ExtractID(cl.ID, "counter line ID field is nil")
+}
+
 // CounterLineServiceProperty representa las propiedades de servicio de una línea de contador
 type CounterLineServiceProperty struct {
 	Service    *string        `json:"service"`
@@ -41,6 +50,38 @@ type XPlorCounterLines struct {
 	Type         string             `json:"@type"`
 	CounterLines []XPlorCounterLine `json:"hydra:member"`
 	Pagination   *HydraView         `json:"hydra:view,omitempty"`
+}
+
+// XPlorCounterLinesParams represents filters for the counter-line collection.
+type XPlorCounterLinesParams struct {
+	ContactID  string
+	ContactIDs []string
+	ArticleID  string
+	ArticleIDs []string
+	Active     *bool
+}
+
+// ToValues converts counter-line filters to URL query parameters.
+func (p XPlorCounterLinesParams) ToValues(values *url.Values) {
+	if strings.TrimSpace(p.ContactID) != "" {
+		values.Set("contactId", p.ContactID)
+	}
+	for _, id := range p.ContactIDs {
+		if strings.TrimSpace(id) != "" {
+			values.Add("contactId[]", id)
+		}
+	}
+	if strings.TrimSpace(p.ArticleID) != "" {
+		values.Set("articleId", p.ArticleID)
+	}
+	for _, id := range p.ArticleIDs {
+		if strings.TrimSpace(id) != "" {
+			values.Add("articleId[]", id)
+		}
+	}
+	if p.Active != nil {
+		values.Set("active", strconv.FormatBool(*p.Active))
+	}
 }
 
 // Métodos para XPlorCounterLine

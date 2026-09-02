@@ -200,6 +200,59 @@ func ExecuteRequest[T any](ctx context.Context, client *http.Client, request *ht
 	}
 }
 
+// ExecuteBinaryRequest executes a request whose successful response is raw bytes.
+func ExecuteBinaryRequest(ctx context.Context, client *http.Client, request *http.Request, debug bool) RequestResult[[]byte] {
+	if debug {
+		curlCommand, curlErr := formatCurlCommand(request)
+		if curlErr != nil {
+			log.Printf("Failed to format cURL command: %v", curlErr)
+		} else {
+			fmt.Println(curlCommand)
+		}
+	}
+
+	response, clientErr := client.Do(request)
+	if clientErr != nil {
+		return RequestResult[[]byte]{
+			Error: &ErrorResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to execute request: " + clientErr.Error(),
+			},
+		}
+	}
+	defer response.Body.Close()
+
+	if debug {
+		fmt.Printf("Response status: %s\n", response.Status)
+		for _, key := range sortedHeaderKeys(response.Header) {
+			for _, value := range response.Header.Values(key) {
+				fmt.Printf("Response header %s: %s\n", key, value)
+			}
+		}
+	}
+
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return RequestResult[[]byte]{
+			Error: &ErrorResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to read response body: " + err.Error(),
+			},
+		}
+	}
+
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
+		return RequestResult[[]byte]{
+			Error: &ErrorResponse{
+				Code:    response.StatusCode,
+				Message: "Response: " + string(bodyBytes),
+			},
+		}
+	}
+
+	return RequestResult[[]byte]{Response: bodyBytes}
+}
+
 func AddQueryParam(name string, value *string, values *url.Values) {
 	if value != nil && *value != "" {
 		values.Add(name, *value)

@@ -48,7 +48,7 @@ type XPlorSubscription struct {
 	StatisticsDisabled      bool                 `json:"statisticsDisabled"`
 	ServiceProperty         any                  `json:"serviceProperty"`
 	InitialInfo             InitialInfo          `json:"initialInfo"`
-	SharedResource          string               `json:"sharedResource"`
+	SharedResource          any                  `json:"sharedResource"`
 	AutoRenewal             bool                 `json:"autoRenewal"`
 	RenewalExpiredAt        string               `json:"renewalExpiredAt"`
 	RenewalInfo             []RenewalInfo        `json:"renewalInfo"`
@@ -161,7 +161,7 @@ type SubscriptionOption struct {
 	StatisticsDisabled      bool              `json:"statisticsDisabled"`
 	ServiceProperty         any               `json:"serviceProperty"`
 	InitialInfo             InitialInfo       `json:"initialInfo"`
-	SharedResource          string            `json:"sharedResource"`
+	SharedResource          any               `json:"sharedResource"`
 	AutoRenewal             bool              `json:"autoRenewal"`
 	RenewalExpiredAt        string            `json:"renewalExpiredAt"`
 	RenewalInfo             []RenewalInfo     `json:"renewalInfo"`

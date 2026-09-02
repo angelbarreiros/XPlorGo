@@ -28,17 +28,27 @@ type xplorExecutor struct {
 
 func Init(cfg *xplorConfig) *XplorProvider {
 	syncOnce.Do(func() {
-		xplorProviderInstace = &XplorProvider{
-			authMutex:        &sync.Mutex{},
-			nodeClubRelation: make(map[string]string),
-			providers: &sync.Pool{
-				New: func() any {
-					return &xplorExecutor{config: cfg, client: http.DefaultClient, defaultTimeout: 30 * time.Second}
-				},
-			},
-		}
+		xplorProviderInstace = newProvider(cfg)
 	})
 	return xplorProviderInstace
+}
+
+// NewProvider creates an isolated provider for a specific API configuration.
+// Use this when a process needs to talk to more than one XPlor environment.
+func NewProvider(cfg *xplorConfig) *XplorProvider {
+	return newProvider(cfg)
+}
+
+func newProvider(cfg *xplorConfig) *XplorProvider {
+	return &XplorProvider{
+		authMutex:        &sync.Mutex{},
+		nodeClubRelation: make(map[string]string),
+		providers: &sync.Pool{
+			New: func() any {
+				return &xplorExecutor{config: cfg, client: http.DefaultClient, defaultTimeout: 30 * time.Second}
+			},
+		},
+	}
 }
 func checkNodeId(nodeId string) *xplorentities.ErrorResponse {
 	if strings.TrimSpace(nodeId) == "" {
@@ -399,7 +409,7 @@ func (xd *XplorProvider) ContactImages(nodeId string, params *xplorentities.XPlo
 
 	return contactImages, nil
 }
-func (xd *XplorProvider) ContactImage(nodeId string, contactImageId string) (*xplorentities.XPlorContactImage, *xplorentities.ErrorResponse) {
+func (xd *XplorProvider) ContactImage(nodeId string, contactImageId string) ([]byte, *xplorentities.ErrorResponse) {
 	contactImageId = strings.TrimSpace(contactImageId)
 	if contactImageId == "" {
 		return nil, &xplorentities.ErrorResponse{
@@ -615,14 +625,16 @@ func (xe *XplorProvider) Coach(nodeId string, coachId string) (*xplorentities.XP
 	return coach, nil
 
 }
-func (xe *XplorProvider) Articles(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorArticles, *xplorentities.ErrorResponse) {
+
+// Articles retrieves articles matching the supplied collection filters.
+func (xe *XplorProvider) Articles(nodeId string, params *xplorentities.XPlorArticlesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorArticles, *xplorentities.ErrorResponse) {
 	executor, err := xe.getExecutorFullyInitialized(nodeId)
 	if err != nil {
 		return nil, err
 	}
 	defer xe.putExecutor(executor)
 
-	articles, err := executor.articles(xe.token.Token.AccessToken, pagination)
+	articles, err := executor.articles(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
@@ -724,18 +736,19 @@ func (xe *XplorProvider) ClassType(nodeId string, classTypeId string) (*xplorent
 	return classType, nil
 }
 
-func (xe *XplorProvider) CounterLines(nodeId string, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
+// CounterLines retrieves counter lines matching the supplied collection filters.
+func (xe *XplorProvider) CounterLines(nodeId string, params *xplorentities.XPlorCounterLinesParams, pagination *xplorentities.XPlorPagination) (*xplorentities.XPlorCounterLines, *xplorentities.ErrorResponse) {
 	executor, err := xe.getExecutorFullyInitialized(nodeId)
 	if err != nil {
 		return nil, err
 	}
 	defer xe.putExecutor(executor)
 
-	counterLines, err := executor.counterLines(xe.token.Token.AccessToken, pagination)
+	counterLines, err := executor.counterLines(xe.token.Token.AccessToken, params, pagination)
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
-			Message: "Failed to get families: " + err.Message,
+			Message: "Failed to get counter lines: " + err.Message,
 		}
 	}
 
@@ -759,7 +772,7 @@ func (xe *XplorProvider) CounterLine(nodeId string, counterLineId string) (*xplo
 	if err != nil {
 		return nil, &xplorentities.ErrorResponse{
 			Code:    err.Code,
-			Message: "Failed to get family: " + err.Message,
+			Message: "Failed to get counter line: " + err.Message,
 		}
 	}
 	return counterLine, nil

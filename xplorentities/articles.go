@@ -2,6 +2,7 @@ package xplorentities
 
 import (
 	"errors"
+	"net/url"
 	"path"
 	"strconv"
 	"strings"
@@ -16,6 +17,25 @@ type XPlorArticles struct {
 	Type        string         `json:"@type"`
 	HydraMember []XPlorArticle `json:"hydra:member"`
 	Pagination  *HydraView     `json:"hydra:view"`
+}
+
+// XPlorArticlesParams represents filters for the article collection.
+// sale.contactId is the API-supported relationship filter used by the probe.
+type XPlorArticlesParams struct {
+	SaleContactID  string
+	SaleContactIDs []string
+}
+
+// ToValues converts article filters to URL query parameters.
+func (p XPlorArticlesParams) ToValues(values *url.Values) {
+	if strings.TrimSpace(p.SaleContactID) != "" {
+		values.Set("sale.contactId", p.SaleContactID)
+	}
+	for _, id := range p.SaleContactIDs {
+		if strings.TrimSpace(id) != "" {
+			values.Add("sale.contactId[]", id)
+		}
+	}
 }
 
 type XPlorArticle struct {
@@ -40,9 +60,9 @@ type XPlorArticle struct {
 	TaxRate                   float64           `json:"taxRate"`
 	ArticleBehaviors          []ArticleBehavior `json:"articleBehaviors"`
 	Parent                    any               `json:"parent"`
-	CreatedAt                 *util.LocalTime   `json:"createdAt"`
+	CreatedAt                 *util.LocalDate   `json:"createdAt"`
 	CreatedBy                 string            `json:"createdBy"`
-	DeletedAt                 *util.LocalTime   `json:"deletedAt"`
+	DeletedAt                 *util.LocalDate   `json:"deletedAt"`
 	DeletedBy                 any               `json:"deletedBy"`
 	RepaymentSchedule         RepaymentSchedule `json:"repaymentSchedule"`
 	ProductID                 *string           `json:"productId"`
@@ -88,7 +108,7 @@ type RepaymentSchedule struct {
 	Recurrences []Recurrence   `json:"recurrences,omitempty"`
 	SpecificDay bool           `json:"specificDay"`
 	DebitDay    int            `json:"debitDay"`
-	StartDate   util.LocalTime `json:"startDate"`
+	StartDate   util.LocalDate `json:"startDate"`
 }
 
 type Occurrence struct {

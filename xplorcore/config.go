@@ -5,6 +5,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
+	"strings"
 )
 
 type neededHeaders struct {
@@ -47,7 +49,7 @@ func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeader
 			Scheme:   "https",
 			Host:     xc.Host,
 			Path:     "/" + xc.APIVersion + "/" + xc.EnterpriseName + uri,
-			RawQuery: queryParams.Encode(),
+			RawQuery: encodeQueryParams(queryParams),
 		},
 		Header: make(http.Header),
 	}
@@ -65,4 +67,44 @@ func (xc *xplorConfig) generateRequest(method string, uri string, optionalHeader
 
 	return request
 
+}
+
+// encodeQueryParams keeps contact filters first so request logs and gateway
+// filters can reliably identify the attendee scope before pagination fields.
+func encodeQueryParams(values url.Values) string {
+	if len(values) == 0 {
+		return ""
+	}
+
+	preferredKeys := []string{
+		"contact",
+		"contact[]",
+		"contactId",
+		"contactId[]",
+		"sale.contactId",
+		"sale.contactId[]",
+	}
+	preferred := make(map[string]bool, len(preferredKeys))
+	parts := make([]string, 0, len(values))
+	for _, key := range preferredKeys {
+		preferred[key] = true
+		for _, value := range values[key] {
+			parts = append(parts, url.QueryEscape(key)+"="+url.QueryEscape(value))
+		}
+	}
+
+	remainingKeys := make([]string, 0, len(values))
+	for key := range values {
+		if !preferred[key] {
+			remainingKeys = append(remainingKeys, key)
+		}
+	}
+	sort.Strings(remainingKeys)
+	for _, key := range remainingKeys {
+		for _, value := range values[key] {
+			parts = append(parts, url.QueryEscape(key)+"="+url.QueryEscape(value))
+		}
+	}
+
+	return strings.Join(parts, "&")
 }

@@ -50,8 +50,6 @@ func (ci XPlorContactImage) ContactIDValue() (string, error) {
 type XPlorContactImagesParams struct {
 	ContactImageID  string
 	ContactImageIDs []string
-	ContactID       string
-	ContactIDs      []string
 }
 
 // ToValues converts the params to url.Values for query parameters.
@@ -63,16 +61,6 @@ func (p XPlorContactImagesParams) ToValues(values *url.Values) {
 	for _, id := range p.ContactImageIDs {
 		if strings.TrimSpace(id) != "" {
 			values.Add("id[]", id)
-		}
-	}
-
-	contactID := strings.TrimSpace(p.ContactID)
-	if contactID != "" {
-		values.Set("contact", contactID)
-	}
-	for _, id := range p.ContactIDs {
-		if strings.TrimSpace(id) != "" {
-			values.Add("contact[]", id)
 		}
 	}
 }
