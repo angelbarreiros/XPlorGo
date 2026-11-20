@@ -25,7 +25,15 @@
   several contacts at once is not supported by the API; use `ContactId` and
   make one request per contact.
 
-## [0.2.0] - 2026-09-02
+## [0.1.43] - 2026-09-02
+
+### Fixed
+
+- Requests rejected with 401 because the access token expired are retried
+  once after refreshing the token. Concurrent requests share a single
+  refresh.
+
+## [0.1.42] - 2026-09-02
 
 ### Added
 
