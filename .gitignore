@@ -4,8 +4,14 @@ ia
 .env
 *.json
 *.md
+!RECURRENCE_CLUB_FILTER.md
+# Local AI context for the recurrence-cost integration (intentionally untracked).
+RECURRENCE_COST_PER_STUDENT.md
 *.txt
 dsadsa.txt
 scripts/
 .codex/
 .agents/
+probe.go
+tmp.go
+*.sh
