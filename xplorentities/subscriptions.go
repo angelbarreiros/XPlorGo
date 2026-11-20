@@ -217,7 +217,6 @@ type XPlorSubscriptionsParams struct {
 	Page                   int
 	ItemsPerPage           int
 	ContactId              string
-	ContactIds             []string
 	ContactGivenName       string
 	ContactFamilyName      string
 	ContactClubId          string
@@ -271,11 +270,6 @@ func (p XPlorSubscriptionsParams) ToValues(values *url.Values) {
 	}
 	if strings.TrimSpace(p.ContactId) != "" {
 		values.Set("contact", p.ContactId)
-	}
-	for _, id := range p.ContactIds {
-		if strings.TrimSpace(id) != "" {
-			values.Add("contact[]", id)
-		}
 	}
 	if strings.TrimSpace(p.ContactGivenName) != "" {
 		values.Set("contact.givenName", p.ContactGivenName)

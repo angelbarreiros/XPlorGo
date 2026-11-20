@@ -389,9 +389,11 @@ Subscriptions(nodeId string, params *XPlorSubscriptionsParams,
 Subscription(nodeId string, subscriptionId string) -> (*XPlorSubscription, error)
 ```
 
-Use `XPlorSubscriptionsParams.ContactId` or `ContactIds` to restrict the
-collection request to one or more contacts. These are serialized as
-`contact`/`contact[]` and are emitted before pagination parameters.
+Use `XPlorSubscriptionsParams.ContactId` to restrict the collection request
+to a single contact. It is serialized as `contact` and emitted before
+pagination parameters. Filtering by several contacts at once (`contact[]`) is
+not supported by the API (it returns 400); make one request per contact
+instead.
 
 ### User Management
 ```go
