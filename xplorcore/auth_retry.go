@@ -18,10 +18,16 @@ type authRetryTransport struct {
 	base     http.RoundTripper
 }
 
-func newXplorHTTPClient(provider *XplorProvider) *http.Client {
-	base := http.DefaultClient.Transport
+func newXplorHTTPClient(provider *XplorProvider, cfg *xplorConfig) *http.Client {
+	var base http.RoundTripper = http.DefaultClient.Transport
 	if base == nil {
 		base = http.DefaultTransport
+	}
+	// When enabled, transient failures (5xx, network errors) are retried below
+	// the auth layer, so the request replayed after a token refresh is covered
+	// too.
+	if cfg.Retry != nil {
+		base = &retryTransport{base: base, policy: *cfg.Retry, debug: cfg.Debug}
 	}
 
 	return &http.Client{

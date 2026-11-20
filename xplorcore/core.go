@@ -12,6 +12,8 @@ import (
 var xplorProviderInstace *XplorProvider = nil
 var syncOnce sync.Once
 
+const defaultRequestTimeout = 30 * time.Second
+
 type XplorProvider struct {
 	providers        *sync.Pool
 	token            *xplorentities.XPlorTokenWithTimestamp
@@ -44,12 +46,16 @@ func newProvider(cfg *xplorConfig) *XplorProvider {
 		authMutex:        &sync.Mutex{},
 		nodeClubRelation: make(map[string]string),
 	}
+	timeout := cfg.RequestTimeout
+	if timeout <= 0 {
+		timeout = defaultRequestTimeout
+	}
 	provider.providers = &sync.Pool{
 		New: func() any {
 			return &xplorExecutor{
 				config:         cfg,
-				client:         newXplorHTTPClient(provider),
-				defaultTimeout: 30 * time.Second,
+				client:         newXplorHTTPClient(provider, cfg),
+				defaultTimeout: timeout,
 			}
 		},
 	}

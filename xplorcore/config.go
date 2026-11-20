@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"time"
 )
 
 type neededHeaders struct {
@@ -22,6 +23,27 @@ type xplorConfig struct {
 	ClientSecret   string
 	NeededHeaders  []neededHeaders
 	Debug          bool
+	// RequestTimeout is the total time budget of each SDK method, including
+	// retries. Defaults to 30s.
+	RequestTimeout time.Duration
+	// Retry enables automatic retries on 5xx / network errors. nil (the
+	// default) means no retries; set it with WithRetry.
+	Retry *RetryPolicy
+}
+
+// WithRequestTimeout sets the total time budget of each SDK method call,
+// retries included. Must be called before Init/NewProvider.
+func (xc *xplorConfig) WithRequestTimeout(timeout time.Duration) *xplorConfig {
+	xc.RequestTimeout = timeout
+	return xc
+}
+
+// WithRetry enables automatic retries of 5xx / network errors with the given
+// policy (RetryPolicy{} uses the defaults). Retries are disabled unless this
+// is called. Must be called before Init/NewProvider.
+func (xc *xplorConfig) WithRetry(policy RetryPolicy) *xplorConfig {
+	xc.Retry = &policy
+	return xc
 }
 
 func NewConfig(host string, apiVersion string, enterpriseName, clientID, clientSecret string, headers map[string]string, debug bool) *xplorConfig {
