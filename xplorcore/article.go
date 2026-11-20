@@ -36,7 +36,7 @@ func (xe xplorExecutor) articles(accesToken string, params *xplorentities.XPlorA
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 
@@ -64,7 +64,7 @@ func (xe xplorExecutor) article(accesToken string, articleId string) (*xplorenti
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 

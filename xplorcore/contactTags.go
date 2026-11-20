@@ -36,7 +36,7 @@ func (xe xplorExecutor) contactTags(accesToken string, params *xplorentities.XPl
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 
@@ -64,7 +64,7 @@ func (xe xplorExecutor) contactTag(accesToken string, contacTagId string) (*xplo
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 

@@ -33,7 +33,7 @@ func (xe xplorExecutor) coaches(accesToken string, pagination *xplorentities.XPl
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 
@@ -61,7 +61,7 @@ func (xe xplorExecutor) coach(accesToken string, familyId string) (*xplorentitie
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 

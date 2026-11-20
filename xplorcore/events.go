@@ -33,7 +33,7 @@ func (xe xplorExecutor) events(accesToken string, pagination *xplorentities.XPlo
 	case <-ctxWithTimeout.Done():
 		return nil, &xplorentities.ErrorResponse{
 			Code:    http.StatusRequestTimeout,
-			Message: "Request timeout: operation cancelled after 10 seconds",
+			Message: "Request timeout: operation cancelled after " + xe.defaultTimeout.String(),
 		}
 	}
 
